@@ -283,7 +283,7 @@ def Environment_classifier(Data, K):
 
 	
 
-	print DG.shape,Dfil.shape,Df.shape
+	print DG.shape,Dfil.shape,Df.shape,len(Data['x'])
 	AX1.scatter(data[all_filament_gal,0],data[all_filament_gal,1],color='blue',s=2)
 	AX1.scatter(all_data[Glabel,0],all_data[Glabel,1],s=2,color='red')
 	AX1.scatter(Df['xslice'],Df['yslice'],s=2,color='green')
