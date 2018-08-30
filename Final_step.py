@@ -1,3 +1,7 @@
+import warnings
+warnings.filterwarnings("ignore", message="numpy.dtype size changed")
+warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
+
 from astropy.io import ascii
 from astropy.table import Table, join 
 import sys

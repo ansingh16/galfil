@@ -1,3 +1,7 @@
+import warnings
+warnings.filterwarnings("ignore", message="numpy.dtype size changed")
+warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
+
 import numpy as np 
 import sys
 from astropy.io import ascii
@@ -91,8 +95,9 @@ def Plot_this(DATA,Params,R):
 	return Pprime
 
 
-Available_data = ascii.read('DATA_FOR_ANALYSIS_WITHOUT_QUERRY.csv',names=['id','SM','VelDisp','SFR','GM',\
-		'Tot_Mass','SM_sh','Metal','SF_Metal','NSF_Metal','SF_O','SF_H','x','y','z','Vel','Mass_sh','u','g','r','i','zmag','Y','J','H','K'])
+Available_data = ascii.read('DATA_FOR_ANALYSIS_WITHOUT_QUERRY.csv',names=['id','SM','VelDisp','SFR',\
+	'GM','Tot_Mass','SM_sh','Metal','SF_Metal','NSF_Metal',\
+	'SF_O','SF_H','x','y','z','SubGrpNum','Vel','Mass_sh','u','g','r','i','zmag','Y','J','H','K'])
 print Available_data.keys()
 
 for i in range(1,numslice+1):

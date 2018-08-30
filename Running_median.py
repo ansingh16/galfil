@@ -1,3 +1,7 @@
+import warnings
+warnings.filterwarnings("ignore", message="numpy.dtype size changed")
+warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
+
 import pandas as pd
 import sys
 import matplotlib.pyplot as plt

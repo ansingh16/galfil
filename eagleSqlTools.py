@@ -2,6 +2,9 @@
 
 # Module to access the EAGLE public database
 # John Helly 2015 for the Virgo Consortium
+import warnings
+warnings.filterwarnings("ignore", message="numpy.dtype size changed")
+warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
 
 import numpy as np
 import urllib

@@ -1,6 +1,7 @@
 import warnings
 warnings.filterwarnings("ignore", message="numpy.dtype size changed")
 warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
+from scipy import stats
 
 import matplotlib.pyplot as plt 
 import pandas as pd
@@ -12,7 +13,7 @@ import ConfigParser
 from numpy import linspace, meshgrid
 from matplotlib.mlab import griddata
 
-plt.style.use('dark_background')
+#plt.style.use('dark_background')
 
 Path = 'Figures/'
 
@@ -43,6 +44,9 @@ def binning(col, cut_points, labels=None):
 		  #Define min and max values:
 		  minval = col.min()
 		  maxval = col.max()
+		  #minval = 8.0#col.min()
+		  #maxval = 11.0#col.max()
+
 
 		  #create list by adding min and max to cut_points
 		  break_points = [minval] + cut_points + [maxval]
@@ -53,6 +57,7 @@ def binning(col, cut_points, labels=None):
 
 		  #Binning using cut function of pandas
 		  colBin = pd.cut(col,bins=break_points,labels=labels,include_lowest=True)
+
 		  return colBin
 
 		
@@ -75,8 +80,9 @@ def Separate_ENV():
 	Total_data['u_minus_r'] = Total_data['u'] - Total_data['r']
 	Total_data['g_minus_r'] = Total_data['g'] - Total_data['r']
 
+	Total_data['sSFR'] = Total_data['SFR']/Total_data['SM']
 
-
+	Total_data['logSM'] = np.log10(Total_data['SM'])
 
 	grouped = Total_data.groupby('ENV')
 
@@ -139,27 +145,7 @@ def Mvscol():
 			##########################################################M_star vs u-r######################################
 			fig,(ax1,ax2,ax3) = plt.subplots(1,3,figsize=(14,6),sharey=True)
 
-			Total_data = pd.read_csv('All_Data_Stacked.csv')
-			#Total_data = pd.read_csv('SLICED_13/Final_data.csv')
-
-			
-			grouped = Total_data.groupby('ENV')
-
-			for key,data in grouped:
-				print key,data.shape
-
-				if key=='filament':
-					data['ENV'][Total_data['d_per'] > 1.0] = 'field'
-					Filament = data
-				if key=='groups':
-					Groups = data
-
-				if key=='field':
-					Field = data
-
-				
-			print Groups.shape,Filament.shape,Field.shape
-
+			Groups,Filament,Field = Separate_ENV()
 
 			cb = ax1.scatter(np.log10(Groups['SM']),Groups['u'] - Groups['r'],c=np.log10(Groups['Metal']/0.012),s=2)
 			ax2.scatter(np.log10(Filament['SM']),Filament['u'] - Filament['r'],c=np.log10(Filament['Metal']/0.012),s=2)
@@ -219,7 +205,7 @@ def Mvscol():
 			ax2.scatter(Filament['xslice'],Filament['yslice'],s=2,color='blue')
 			ax2.scatter(Field['xslice'],Field['yslice'],s=2,color='green')
 
-			fig.savefig(Path+'slice13_Stellar_mass_vs_uminusr.png',dpi=600,bbox_inches='tight')
+			fig.savefig(Path+'Stellar_mass_vs_uminusr.png',dpi=600,bbox_inches='tight')
 
 			plt.show()
 
@@ -230,13 +216,17 @@ def histogram(prop,logit,dens):
 
 			Groups,Filament,Field = Separate_ENV()
 			
-			if logit=='yes':
+			if logit=='y':
+				Groups = Groups[Groups[prop]!=0.0]
+				Filament = Filament[Filament[prop]!=0.0]
+				Field = Field[Field[prop]!=0.0]
+
 				Groups['log'+prop] = np.log10(Groups[prop])
 				Filament['log'+prop] = np.log10(Filament[prop])
 				Field['log'+prop] = np.log10(Field[prop])
 				prop = 'log'+prop
 
-			if dens=='yes':
+			if dens=='y':
 				dens1 = True
 			else:
 				dens1 = False
@@ -250,14 +240,17 @@ def histogram(prop,logit,dens):
 			bincenters2 = 0.5*(binEdges2[1:]+binEdges2[:-1])
 			bincenters3 = 0.5*(binEdges3[1:]+binEdges3[:-1])
 
-			ax2.plot(binEdges1[:-1], y1,'-o', color='m', linewidth=2, ms=8, label='Groups')
-			ax2.plot(binEdges2[:-1], y2,'-o', color='peru', linewidth=2, ms=8, label='Filament')
-			ax2.plot(binEdges3[:-1], y3,'-o', color='r', linewidth=2, ms=8   ,label='Field')  
+			ax2.plot(binEdges1[:-1], y1,'-', color='m', linewidth=2, ms=8, label='Groups')
+			ax2.plot(binEdges2[:-1], y2,'--', color='peru', linewidth=2, ms=8, label='Filament')
+			ax2.plot(binEdges3[:-1], y3,'-.', color='r', linewidth=2, ms=8   ,label='Field')  
 
-			ax2.set_xlabel(prop)
-			ax2.set_ylabel('Probability density')
+			ax2.set_xlabel(prop,fontsize=14)
+			ax2.set_ylabel('Probability density',fontsize=14)
+			ax2.tick_params(axis='both', which='minor', length=3, width=2, labelsize=12)
+			ax2.tick_params(axis='both', which='major', length=5, width=2, labelsize=12)
+			
 
-			fig2.legend()
+			ax2.legend(fontsize=14)
 			plt.show()
 
 def jointplot(props,xlabel=None,ylabel=None,remove0x=None,remove0y=None,logx=None,logy=None):
@@ -352,7 +345,7 @@ def Voilin_plot():
 
 			import seaborn as sns
 			sns.set(font_scale=1.5)
-			plt.style.use('dark_background')
+			sns.set_style('white')
 
 			fig,ax = plt.subplots(1,1,figsize=(8,8))
 
@@ -365,33 +358,56 @@ def Voilin_plot():
 			plt.show()
 
 
-def Colored_slice():
+def Colored_slice(sliceno):
 
 			################################################################################################################
 
 
 
 			FIG1,AX1 = plt.subplots(1,1,figsize=(8,8))
-			global direc
-			direc = './SLICED_' + str(15) 
+			FIG2,AX2 = plt.subplots(1,1,figsize=(8,8))
+			FIG3,AX3 = plt.subplots(1,1,figsize=(8,8))
+
+
+			direc = './SLICED_' + str(sliceno) 
+
 			'''
+		
+			global direc
+			
 			Params = pd.read_csv(direc+'/Paramters.dat')
 			normal = Params['normal']
 			global pplain 
 			pplain = (Params['cluster1']+Params['cluster2'])/2.0
 
 			R = get_rotation_matrix(normal)
+			'''
 				
 
 			Total_data = pd.read_csv(direc+'/Final_data.csv')
-			#Total_data['ENV'][Total_data['d_per'] > 1.0] = 'field'
-			for ind,row in Total_data.iterrows():
+			Total_data['ENV'][Total_data['d_per'] > 1.0] = 'field'
 
-				if(row['d_per']>1.0):
-					Total_data.loc[ind, 'ENV'] = 'field' 
+
+
+			grouped = Total_data.groupby('ENV')
+
+			for key,data in grouped:
+				print key,data.shape
+				if key=='filament':
+					#data['ENV'][Total_data['d_per'] > 1.0] = 'field'
+					Filament = data
+				if key=='groups':
+					Groups = data
+				if key=='field':
+					Field = data
+
+
+	
+
+			#Groups,Filament,Field = Preprocess(Groups,Filament,Field,xprop,yprop,'y','y',logx,logy)
+
 
 			'''
-	
 			dat = pd.read_csv(direc+'/All_env.csv')
 
 			
@@ -409,19 +425,47 @@ def Colored_slice():
 				if key=='field':
 					Field = data
 			
-			AX1.scatter(Field['xslice'],Field['yslice'],s=1,color=Colors[0],label='field',alpha=0.5)
-			AX1.scatter(Filament['xslice'],Filament['yslice'],s=1,color=Colors[1],label='filament',alpha=0.5)
-			AX1.scatter(Groups['xslice'],Groups['yslice'],s=1,color=Colors[2],label='group',alpha=0.5)
-
 			'''
 
+			AX1.scatter(Field['xslice'],Field['yslice'],marker='s',s=10,facecolor='none',edgecolor='k',label='field')
+			AX1.scatter(Filament['xslice'],Filament['yslice'],marker='^',s=10,color='r',label='filament')
+			AX1.scatter(Groups['xslice'],Groups['yslice'],s=6,facecolor='black',edgecolor='k',label='group',alpha=0.3)
+
+			
+			dat = pd.read_csv(direc+'/All_env.csv')
+
+			
+			
+			grouped = dat.groupby('ENV')
+
+			for key,data in grouped:
+				print key,data.shape
+				
+				if key=='filament':
+					data['ENV'][data['d_per'] > 1.0] = 'field'
+					Filament = data
+				if key=='group':
+					Groups = data
+				if key=='field':
+					Field = data
+			
+			AX2.scatter(Field['xslice'],Field['yslice'],s=4,color='grey',label='field',alpha=0.1)
+			AX2.scatter(Filament['xslice'],Filament['yslice'],s=4,color='grey',label='filament',alpha=0.1)
+			AX2.scatter(Groups['xslice'],Groups['yslice'],s=4,color='grey',label='group',alpha=0.1)
+
+			AX3.scatter(Field['xslice'],Field['yslice'],s=4,color='k',label='field',alpha=0.5)
+			AX3.scatter(Filament['xslice'],Filament['yslice'],s=4,color='k',label='filament',alpha=0.5)
+			AX3.scatter(Groups['xslice'],Groups['yslice'],s=4,color='k',label='group',alpha=0.5)
+
+
+			'''
 			for ind,row in data.iterrows():
 
 				if(row['d_per']>1.0):
 					data.loc[ind, 'ENV'] = 'field' 
 			
 			
-
+			'''
 			
 			onlyfiles = [f for f in listdir(direc)]
 				
@@ -434,23 +478,36 @@ def Colored_slice():
 					dat = np.loadtxt(direc+'/'+f)
 					if lengths[q]>=1.0:
 						if dat.shape[0]>3:
-							AX1.plot(dat[:,0],dat[:,1],color='red')
-							AX1.plot([],[])
-			'''
+							AX2.plot(dat[:,0],dat[:,1],color='red')
+							AX2.plot([],[])
+			
 
 			
 			AX1.tick_params(axis='both', which='minor', length=3, width=2, labelsize=14)
 			AX1.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
-
-
 			AX1.set_xlabel(r'$\mathrm{X^{\prime}}$',fontsize=16)
 			AX1.set_ylabel(r'$\mathrm{Y^{\prime}}$',fontsize=16)
 			
-			AX1.legend(fontsize=14,markerscale=5)
+
+			AX2.tick_params(axis='both', which='minor', length=3, width=2, labelsize=14)
+			AX2.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
+			AX2.set_xlabel(r'$\mathrm{X^{\prime}}$',fontsize=16)
+			AX2.set_ylabel(r'$\mathrm{Y^{\prime}}$',fontsize=16)
+
+			AX3.tick_params(axis='both', which='minor', length=3, width=2, labelsize=14)
+			AX3.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
+			AX3.set_xlabel(r'$\mathrm{X^{\prime}}$',fontsize=16)
+			AX3.set_ylabel(r'$\mathrm{Y^{\prime}}$',fontsize=16)
+			
+			
+
+			FIG1.legend(fontsize=14,markerscale=2)
 
 		
 			FIG1.savefig(Path+'/Color_without_filament.png',dpi=600)
-			
+			FIG2.savefig(Path+'/No_color_with_filament.png',dpi=600)
+			FIG3.savefig(Path+'/No_color_without_filament.png',dpi=600)
+
 			plt.show()
 			'''
 			onlyfiles = [f for f in listdir(direc)]
@@ -486,7 +543,7 @@ def All_data():
 		direc = 'SLICED_'+str(i)
 
 		Di = ascii.read(direc+'/Final_data.csv',names=['id','SM','VelDisp','SFR','GM',\
-			'Tot_Mass','SM_sh','Metal','SF_Metal','NSF_Metal','SF_O','SF_H','x','y','z','Vel','Mass_sh','u','g','r','i',\
+			'Tot_Mass','SM_sh','Metal','SF_Metal','NSF_Metal','SF_O','SF_H','x','y','z','SubGrpNum','Vel','Mass_sh','u','g','r','i',\
 			'zmag','Y','J','H','K','index','ENV','d_long','d_per','d_tot','xslice','yslice'])
 		
 		D_final = vstack([D_final, Di])
@@ -502,7 +559,7 @@ def All_data():
 
 def dvscol():
 
-	fig,ax = plt.subplots(1,1,figsize=(8,8))
+	fig,ax = plt.subplots(1,1,figsize=(6,6))
 
 	Total_data = pd.read_csv('All_Data_Stacked.csv')
 
@@ -534,7 +591,7 @@ def dvscol():
 	stack_Data['col'] =  stack_Data.rolling(6000).median()['g_minus_r']
 
 
-	stack_Data.plot(ax = ax,x='D',y='col',legend=False,linewidth=1.5,color='white')
+	stack_Data.plot(ax = ax,x='D',y='col',legend=False,linewidth=1.5,color='k')
 
 	ax.set_xlabel(r'$\mathrm{d_{per}}$(Mpc)',fontsize=16)
 	ax.set_ylabel(r'$\mathrm{g - r}$',fontsize=16)
@@ -542,7 +599,7 @@ def dvscol():
 	ax.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
 
 	#ax.xaxis.set_minor_locator(plt.MultipleLocator(0.1))
-
+	fig.tight_layout()
 	fig.savefig(Path+'d_per_vs_gminusr.png',dpi=600)
 	plt.show()
 
@@ -604,11 +661,14 @@ def Scatter(props,colprop=None,xlabel=None,ylabel=None,logx=None,logy=None,logco
 def Contour(props,xlabel=None,ylabel=None,logx=None,logy=None):
 	
 	
-	import matplotlib.patches as mpatches
+	#import matplotlib.patches as mpatches
+	from matplotlib.lines import Line2D
 
 	import seaborn as sns; sns.set(color_codes=True)
 	sns.set_context(context='paper')
-	plt.style.use("dark_background")
+	sns.set_style("white")
+
+	#plt.style.use("dark_background")
 
 	#sns.set_style("white")
 
@@ -626,45 +686,45 @@ def Contour(props,xlabel=None,ylabel=None,logx=None,logy=None):
 	g = sns.JointGrid(x='log'+xprop, y='log'+yprop, data=Groups,height=6)
 	
 	sns.kdeplot(
-	    Field['log'+xprop], Field['log'+yprop], cmap="Blues",
+	    Filament['log'+xprop], Filament['log'+yprop], cmap="Greys",
 	    shade=False, shade_lowest=False, ax=g.ax_joint,
-	    linestyles='-',label='Field'
+	    linestyles='--',label='Field',n_levels=5
 	)
 	
 	sns.kdeplot(
-	    Groups['log'+xprop], Groups['log'+yprop], cmap="Reds",
+	    Groups['log'+xprop], Groups['log'+yprop], cmap="Greys",
 	    shade=False, shade_lowest=False, ax=g.ax_joint,
-	    linestyles='-',label='Group'
+	    linestyles='-',label='Group',n_levels=5
 	)
 	
 
 	sns.distplot(
-	    Groups['log'+xprop], kde=True, hist=False, color="r",
+	    Groups['log'+xprop], kde=True, hist=False, color="k",
 	    kde_kws=dict(ls ='-'), ax=g.ax_marg_x,axlabel=False
 	)
 	sns.distplot(
-	    Field['log'+xprop], kde=True, hist=False, color="b",
-	    kde_kws=dict(ls='-'), ax=g.ax_marg_x,axlabel=False
+	    Filament['log'+xprop], kde=True, hist=False, color="k",
+	    kde_kws=dict(ls='--'), ax=g.ax_marg_x,axlabel=False
 	)
 	sns.distplot(
-	    Groups['log'+yprop], kde=True, hist=False, color="r",
+	    Groups['log'+yprop], kde=True, hist=False, color="k",
 	    kde_kws=dict(ls ='-'), ax=g.ax_marg_y, vertical=True,axlabel=False
 	)
 	sns.distplot(
-	    Field['log'+yprop], kde=True, hist=False, color="b",
-	    kde_kws=dict(ls='-'), ax=g.ax_marg_y, vertical=True,axlabel=False
+	    Filament['log'+yprop], kde=True, hist=False, color="k",
+	    kde_kws=dict(ls='--'), ax=g.ax_marg_y, vertical=True,axlabel=False
 	)
 	
 	#legend_properties = {'size':12,'color':['b','r']}
 	#legendMain=g.ax_joint.legend(prop=legend_properties,loc='upper right')
 
-	patch1 = mpatches.Patch(color='r', label='Group')
-	patch2 = mpatches.Patch(color='b', label='Field')
+	#patch1 = mpatches.Patch(color='r', label='Group')
+	#patch2 = mpatches.Patch(color='b', label='Filament')
 
-	all_handles = (patch1, patch2)
+	#all_handles = (patch1, patch2)
 
-	leg = g.ax_joint.legend(handles=all_handles)
-	g.ax_joint.add_artist(leg)
+	#leg = g.ax_joint.legend(handles=all_handles)
+	#g.ax_joint.add_artist(leg)
 
 	g.ax_joint.set_xlabel(r"$\mathrm{"+xlabel+"}$",fontsize=12)
 	g.ax_joint.set_ylabel(r"$\mathrm{"+ylabel+"}$",fontsize=12)
@@ -673,49 +733,49 @@ def Contour(props,xlabel=None,ylabel=None,logx=None,logy=None):
 	g.ax_joint.tick_params(axis='both', which='minor', length=3, width=2, labelsize=14)
 	g.ax_joint.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
 	
-
+	
 
 	######################################################################
 
 	f = sns.JointGrid(x='log'+xprop, y='log'+yprop, data=Filament,height=6)
 	
 	sns.kdeplot(
-	    Filament['log'+xprop], Filament['log'+yprop], cmap="Reds",
+	    Filament['log'+xprop], Filament['log'+yprop], cmap="Greys",
 	    shade=False, shade_lowest=False, ax=f.ax_joint,
-	    linestyles='-',label='Filament'
+	    linestyles='--',label='Filament',n_levels=5
 	)
 	sns.kdeplot(
-	    Field['log'+xprop], Field['log'+yprop], cmap="Blues",
+	    Field['log'+xprop], Field['log'+yprop], cmap="Greys",
 	    shade=False, shade_lowest=False, ax=f.ax_joint,
-	    linestyles='-',label='Field'
+	    linestyles='-',label='Field',n_levels=5
 	)
 	sns.distplot(
-	    Filament['log'+xprop], kde=True, hist=False, color="r",
-	    kde_kws=dict(ls ='-'), ax=f.ax_marg_x,axlabel=False
+	    Filament['log'+xprop], kde=True, hist=False, color="k",
+	    kde_kws=dict(ls ='--'), ax=f.ax_marg_x,axlabel=False
 	)
 	sns.distplot(
-	    Field['log'+xprop], kde=True, hist=False, color="b",
+	    Field['log'+xprop], kde=True, hist=False, color="k",
 	    kde_kws=dict(ls='-'), ax=f.ax_marg_x,axlabel=False
 	)
 	sns.distplot(
-	    Filament['log'+yprop], kde=True, hist=False, color="r",
-	    kde_kws=dict(ls ='-'), ax=f.ax_marg_y, vertical=True,axlabel=False
+	    Filament['log'+yprop], kde=True, hist=False, color="k",
+	    kde_kws=dict(ls ='--'), ax=f.ax_marg_y, vertical=True,axlabel=False
 	)
 	sns.distplot(
-	    Field['log'+yprop], kde=True, hist=False, color="b",
+	    Field['log'+yprop], kde=True, hist=False, color="k",
 	    kde_kws=dict(ls='-'), ax=f.ax_marg_y, vertical=True,axlabel=False
 	)
 	
 	#legend_properties = {'size':12,'color':['b','r']}
 	#legendMain=f.ax_joint.legend(prop=legend_properties,loc='upper right')
 
-	patch2 = mpatches.Patch(color='r', label='Filament')
-	patch1 = mpatches.Patch(color='b', label='Field')
+	#patch2 = mpatches.Patch(color='b', label='Filament')
+	#patch1 = mpatches.Patch(color='r', label='Field')
 
-	all_handles = (patch1, patch2)
+	#all_handles = (patch1, patch2)
 
-	leg = f.ax_joint.legend(handles=all_handles)
-	f.ax_joint.add_artist(leg)
+	#leg = f.ax_joint.legend(handles=all_handles)
+	#f.ax_joint.add_artist(leg)
 
 	f.ax_joint.set_xlabel(r"$\mathrm{"+xlabel+"}$",fontsize=12)
 	f.ax_joint.set_ylabel(r"$\mathrm{"+ylabel+"}$",fontsize=12)
@@ -724,15 +784,32 @@ def Contour(props,xlabel=None,ylabel=None,logx=None,logy=None):
 	f.ax_joint.tick_params(axis='both', which='minor', length=3, width=2, labelsize=14)
 	f.ax_joint.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
 	
+	f.ax_joint.set_xlim(1.4,2.0)
+	f.ax_joint.set_ylim(-2.5,1.0)
+	g.ax_joint.set_xlim(1.4,2.0)
+	g.ax_joint.set_ylim(-2.5,1.0)
+
+
 	g.fig.set_figwidth(8)
 	g.fig.set_figheight(8)
 	f.fig.set_figwidth(8)
 	f.fig.set_figheight(8)
 
+	legend_elements = [Line2D([0], [1], ls='-', color='k',label='Field'),
+                       Line2D([0], [1], ls='--', color='k', label='Filament')]
 
-	g.savefig(Path+'kde_veldisp_group_field.png',eps=600)
-	f.savefig(Path+'kde_veldisp_filament_field.png',eps=600)
+	f.ax_joint.legend(handles=legend_elements,fontsize=14)
+
+	legend_elements = [Line2D([0], [1], ls='-', color='k',label='Group'),
+                       Line2D([0], [1], ls='--', color='k', label='Filament')]
+
+	g.ax_joint.legend(handles=legend_elements,fontsize=14)
+
 	
+	g.savefig(Path+'kde_'+yprop+xprop+'_group_filament.png',eps=600)
+	f.savefig(Path+'kde_'+yprop+xprop+'_field_filament.png',eps=600)
+	
+
 	plt.show()
 
 
@@ -748,29 +825,407 @@ def Binned_dist(prop,xlabel,logx):
 		
 			#Binning:
 			#Binning age:
-			cut_points = [0.2,0.4,0.6,0.8,1.0,1.2,1.4,1.6,1.8,2.0,2.2,2.4,2.6,2.8]
+			cut_points = [0.5,1.0]
 
 			All_data["d_Bin"] = binning(All_data["d_per"], cut_points)
 			#print pd.value_counts(All_data["d_Bin"], sort=True)
 
 			bin1 = All_data[All_data["d_Bin"]==0]
+			bin1 = bin1[bin1['SFR']!=0.0]
+
 			bin2 = All_data[All_data["d_Bin"]==1]
+			bin2 = bin2[bin2['SFR']!=0.0]
+
 			bin3 = All_data[All_data["d_Bin"]==2]
-			bin4 = All_data[All_data["d_Bin"]==3]
+			bin3 = bin3[bin3['SFR']!=0.0]
+
+			
 
 
-			bin1['log'+prop].plot.hist(ax=ax,histtype=u'step',density=1,label='<0.2 Mpc')
-			bin2['log'+prop].plot.hist(ax=ax,histtype=u'step',density=1,label='0.2 - 0.4 Mpc')
-			bin3['log'+prop].plot.hist(ax=ax,histtype=u'step',density=1,label='0.4 - 0.6 Mpc')
-			bin4['log'+prop].plot.hist(ax=ax,histtype=u'step',density=1,label='0.6 - 0.8 Mpc')
+
+			bin1['log'+prop].plot.hist(ax=ax,histtype=u'step',density=1,bins=20,label='<0.5 Mpc')
+			bin2['log'+prop].plot.hist(ax=ax,histtype=u'step',density=1,bins=20,label='0.5-1.0 Mpc')
+			bin3['log'+prop].plot.hist(ax=ax,histtype=u'step',density=1,bins=20,label='>1.0 Mpc')
+			#bin4['log'+prop].plot.hist(ax=ax,histtype=u'step',density=1,label='0.6 - 0.8 Mpc')
 
 			ax.set_xlabel(r'$\mathrm{'+xlabel+'}$')
 
 		
-		plt.legend()
-		fig.savefig(Path+'/Binned_dist.png',dpi=600)
+		plt.legend(title=r'$\mathrm{d_{per}}$')
+		fig.savefig(Path+'/Binned_dist_'+prop+'.png',dpi=600)
 
 		plt.show()
+
+
+def Binned_Mass():
+
+		All_data = pd.read_csv('All_Data_Stacked.csv')
+		fig = plt.figure(figsize = (6,6))
+		ax = fig.gca()
+   
+		
+		All_data['logSM'] = np.log10(All_data['M'])
+		All_data['g_minus_r'] = All_data['g'] - All_data['r']
+
+		#Binning:
+		#Binning age:
+		cut_points = [9.5]
+
+		All_data = All_data[All_data['ENV'] == 'filament']
+
+		All_data.sort_values(by='logSM',axis=0,inplace=True)
+
+		#print All_data['logSM']
+
+		All_data["M_Bin"] = binning(All_data["logSM"], cut_points)
+		#print pd.value_counts(All_data["d_Bin"], sort=True)
+
+		bin1 = All_data[All_data["M_Bin"]==0]
+		bin2 = All_data[All_data["M_Bin"]==1]
+		#bin3 = All_data[All_data["M_Bin"]==2]
+
+		print bin1.shape,bin2.shape
+
+		feature=['d_per','g_minus_r']
+
+		stack_Data1 = bin1[feature]
+		stack_Data1 = stack_Data1.dropna()
+		stack_Data1.sort_values('d_per',inplace=True)
+		stack_Data1['D'] =  stack_Data1.rolling(6000).median()['d_per']
+		stack_Data1['col'] =  stack_Data1.rolling(6000).median()['g_minus_r']
+		stack_Data1.plot(ax = ax,x='D',y='col',legend=False,linewidth=1.5,color='r',label=r'< 9')
+
+		stack_Data2 = bin2[feature]
+		stack_Data2 = stack_Data2.dropna()
+		stack_Data2.sort_values('d_per',inplace=True)
+		stack_Data2['D'] =  stack_Data2.rolling(1000).median()['d_per']
+		stack_Data2['col'] =  stack_Data2.rolling(1000).median()['g_minus_r']
+		stack_Data2.plot(ax = ax,x='D',y='col',legend=False,linewidth=1.5,color='b',label=r'> 9')
+		
+		'''
+		stack_Data3 = bin3[feature]
+		stack_Data3 = stack_Data3.dropna()
+		stack_Data3.sort_values('d_per',inplace=True)
+		stack_Data3['D'] =  stack_Data3.rolling(50).median()['d_per']
+		stack_Data3['col'] =  stack_Data3.rolling(50).median()['g_minus_r']
+		stack_Data3.plot(ax = ax,x='D',y='col',legend=False,linewidth=1.5,color='g',label=r'10-11')
+
+		'''
+
+
+
+
+		ax.set_xlabel(r'$\mathrm{d_{per}}$(Mpc)',fontsize=16)
+		ax.set_ylabel(r'$\mathrm{g - r}$',fontsize=16)
+		ax.tick_params(axis='both', which='minor', length=3, width=2, labelsize=14)
+		ax.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
+
+	
+		
+		
+		plt.legend(title=r"$\mathrm{log \ M_{*}}$")
+		#fig.savefig(Path+'/Binned_dist_'+prop+'.png',dpi=600)
+
+		plt.show()
+
+def Gas_plots():
+	
+	fig3,ax3 = plt.subplots(1,1,figsize=(6,6))
+
+	Groups,Filament,Field = Separate_ENV()
+
+
+	Filament = Filament[Filament['GM']!=0.0]
+	Filament['logGM'] = np.log10(Filament['GM'])
+
+	Filament['GMF'] = Filament['logGM'] - np.log10(Filament['Tot_Mass'])
+	Filament['SMF'] = Filament['logSM'] - np.log10(Filament['Tot_Mass'])
+
+
+	feature=['d_per','GMF','SMF']
+
+	stack_Data1 = Filament[feature]
+	stack_Data1 = stack_Data1.dropna()
+	stack_Data1.sort_values('d_per',inplace=True)
+	stack_Data1['D'] =  stack_Data1.rolling(6000).median()['d_per']
+	stack_Data1['col'] =  stack_Data1.rolling(6000).median()['GMF']
+	stack_Data1.plot(ax = ax3,x='D',y='col',legend=False,linestyle='-',linewidth=1.5,color='b',label=r'$\mathrm{M_{gas}/M_{tot}}$')
+
+
+	stack_Data1['D'] =  stack_Data1.rolling(6000).median()['d_per']
+	stack_Data1['col2'] =  stack_Data1.rolling(6000).median()['SMF']
+	stack_Data1.plot(ax = ax3,x='D',y='col2',legend=False,linestyle='-',linewidth=1.5,color='r',label=r'$\mathrm{M_{*}/M_{tot}}$')
+
+	ax3.set_ylabel(r'$\mathrm{M/M_{tot}}$',fontsize=14)
+	ax3.set_xlabel(r'$\mathrm{d_{per} \ (Mpc)}$',fontsize=14)
+	ax3.tick_params(axis='both', which='minor', length=3, width=2, labelsize=16)
+	ax3.tick_params(axis='both', which='major', length=5, width=2, labelsize=16)
+
+
+	ax3.legend(fontsize=14)
+
+	fig3.tight_layout()
+
+	fig3.savefig(Path+'/d_per_vs_mass_frac.png',dpi=600)
+
+	#plt.show()
+
+
+def random_d_per():
+
+
+		fig,ax = plt.subplots(1,1,figsize=(8,8))
+
+		Total_data = pd.read_csv('/home/ankit/Fortran_code/All_Data_Stacked.csv')
+
+		Filament = Total_data[Total_data['ENV']=='filament']
+
+		d_per = Filament['d_per']
+
+		#print Filament['d_per'].head()
+
+
+		d_per = d_per.sample(frac=1)
+
+		#print d_per.head()
+
+		d_per.reset_index(inplace=True, drop=True)
+
+		Filament['d_per'] = d_per
+
+		#print Filament['d_per'].head()
+
+		Filament.sort_values('d_per',inplace=True)
+
+		Filament = Filament.reset_index(drop=True)
+
+		Filament['g_minus_r'] = Filament['g'] - Filament['r']
+
+		#print Filament['d_per'].max()
+
+
+		feature=['d_per','g_minus_r']
+
+		stack_Data = Filament[feature]
+
+
+		stack_Data = stack_Data.dropna()
+		stack_Data.sort_values('d_per',inplace=True)
+
+		stack_Data.to_csv('Stacked_Data.csv',index=False)
+
+		stack_Data['D'] =  stack_Data.rolling(6000).median()['d_per']
+		stack_Data['col'] =  stack_Data.rolling(6000).median()['g_minus_r']
+
+
+		stack_Data.plot(ax = ax,x='D',y='col',legend=False,linewidth=1.5,color='k')
+
+		ax.set_xlabel(r'$\mathrm{d_{per}}$(Mpc)',fontsize=16)
+		ax.set_ylabel(r'$\mathrm{g - r}$',fontsize=16)
+		ax.tick_params(axis='both', which='minor', length=3, width=2, labelsize=14)
+		ax.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
+
+		#ax.xaxis.set_minor_locator(plt.MultipleLocator(0.1))
+
+		fig.tight_layout()
+		fig.savefig('/home/ankit/Fortran_code/Figures/Random_dper.png',dpi=600)
+		plt.show()
+
+
+def Metallicity_plot():
+
+		Total_data = pd.read_csv('/home/ankit/Fortran_code/All_Data_Stacked.csv')
+
+
+		Colors = ['#3F6C45','#CB6318','#29a8ab']
+
+		Groups,Filament,Field = Separate_ENV()
+
+
+		fig,ax = plt.subplots(1,1,figsize=(6,6))
+
+
+		Filament.sort_values('SM',inplace=True)
+		Filament = Filament.reset_index(drop=True)
+		Filament = Filament[Filament['SF_Metal']!=0.0]
+		Filament['logSM'] = np.log10(Filament['SM'])
+		Filament['logSF_Metal'] = np.log10(Filament['SF_Metal'])
+
+		feature=['logSM','logSF_Metal']
+		stack_Data = Filament[feature]
+		stack_Data = stack_Data.dropna()
+		stack_Data.sort_values('logSM',inplace=True)
+		stack_Data['D'] =  stack_Data.rolling(6000).median()['logSM']
+		stack_Data['col'] =  stack_Data.rolling(6000).median()['logSF_Metal']
+		stack_Data.plot(ax = ax,x='D',y='col',legend=False,linewidth=1.5,color=Colors[1],label='Filament')
+
+		ax.set_xlabel(r'$\mathrm{log \ M_{*}\; (M_{\odot})}$',fontsize=16)
+		ax.set_ylabel(r'$\mathrm{Z_{SF}}$',fontsize=16)
+		ax.tick_params(axis='both', which='minor', length=3, width=2, labelsize=14)
+		ax.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
+
+
+
+		Groups.sort_values('SM',inplace=True)
+		Groups = Groups.reset_index(drop=True)
+		Groups = Groups[Groups['SF_Metal']!=0.0]
+		Groups['logSM'] = np.log10(Groups['SM'])
+		Groups['logSF_Metal'] = np.log10(Groups['SF_Metal'])
+
+		feature=['logSM','logSF_Metal']
+		stack_Data = Groups[feature]
+		stack_Data = stack_Data.dropna()
+		stack_Data.sort_values('logSM',inplace=True)
+		stack_Data['D'] =  stack_Data.rolling(6000).median()['logSM']
+		stack_Data['col'] =  stack_Data.rolling(6000).median()['logSF_Metal']
+		stack_Data.plot(ax = ax,x='D',y='col',legend=False,linewidth=1.5,color=Colors[0],label='Group')
+
+		ax.set_xlabel(r'$\mathrm{log \ M_{*}\; (M_{\odot})}$',fontsize=16)
+		ax.set_ylabel(r'$\mathrm{Z_{SF}}$',fontsize=16)
+		ax.tick_params(axis='both', which='minor', length=3, width=2, labelsize=14)
+		ax.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
+
+
+
+		Field.sort_values('SM',inplace=True)
+		Field = Field.reset_index(drop=True)
+		Field = Field[Field['SF_Metal']!=0.0]
+		Field['logSM'] = np.log10(Field['SM'])
+		Field['logSF_Metal'] = np.log10(Field['SF_Metal'])
+
+		feature=['logSM','logSF_Metal']
+		stack_Data = Field[feature]
+		stack_Data = stack_Data.dropna()
+		stack_Data.sort_values('logSM',inplace=True)
+		stack_Data['D'] =  stack_Data.rolling(6000).median()['logSM']
+		stack_Data['col'] =  stack_Data.rolling(6000).median()['logSF_Metal']
+		stack_Data.plot(ax = ax,x='D',y='col',legend=False,linewidth=1.5,color=Colors[2],label='Field')
+
+		ax.set_xlabel(r'$\mathrm{log \ M_{*}\; (M_{\odot})}$',fontsize=16)
+		ax.set_ylabel(r'$\mathrm{log \ Z_{SF}}$',fontsize=16)
+		ax.tick_params(axis='both', which='minor', length=3, width=2, labelsize=14)
+		ax.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
+
+
+		ax.legend(fontsize=14)
+		#ax.xaxis.set_minor_locator(plt.MultipleLocator(0.1))
+		fig.tight_layout()
+		fig.savefig('/home/ankit/Fortran_code/Figures/SFMetallicity_vs_Mstar.png',dpi=600)
+		#plt.show()
+
+
+
+
+		fig,ax = plt.subplots(1,1,figsize=(6,6))
+		Groups,Filament,Field = Separate_ENV()
+
+		Filament.sort_values('SM',inplace=True)
+		Filament = Filament.reset_index(drop=True)
+		Filament = Filament[Filament['NSF_Metal']!=0.0]
+		Filament['logSM'] = np.log10(Filament['SM'])
+		Filament['logNSF_Metal'] = np.log10(Filament['NSF_Metal'])
+
+		feature=['logSM','logNSF_Metal']
+		stack_Data = Filament[feature]
+		stack_Data = stack_Data.dropna()
+		stack_Data.sort_values('logSM',inplace=True)
+		stack_Data['D'] =  stack_Data.rolling(6000).median()['logSM']
+		stack_Data['col'] =  stack_Data.rolling(6000).median()['logNSF_Metal']
+		stack_Data.plot(ax = ax,x='D',y='col',legend=False,linewidth=1.5,color=Colors[1],label='Filament')
+
+		Groups.sort_values('SM',inplace=True)
+		Groups = Groups.reset_index(drop=True)
+		Groups = Groups[Groups['NSF_Metal']!=0.0]
+		Groups['logSM'] = np.log10(Groups['SM'])
+		Groups['logNSF_Metal'] = np.log10(Groups['NSF_Metal'])
+
+		feature=['logSM','logNSF_Metal']
+		stack_Data = Groups[feature]
+		stack_Data = stack_Data.dropna()
+		stack_Data.sort_values('logSM',inplace=True)
+		stack_Data['D'] =  stack_Data.rolling(6000).median()['logSM']
+		stack_Data['col'] =  stack_Data.rolling(6000).median()['logNSF_Metal']
+		stack_Data.plot(ax = ax,x='D',y='col',legend=False,linewidth=1.5,color=Colors[0],label='Group')
+
+		Field.sort_values('SM',inplace=True)
+		Field = Field.reset_index(drop=True)
+		Field = Field[Field['NSF_Metal']!=0.0]
+		Field['logSM'] = np.log10(Field['SM'])
+		Field['logNSF_Metal'] = np.log10(Field['NSF_Metal'])
+
+		feature=['logSM','logNSF_Metal']
+		stack_Data = Field[feature]
+		stack_Data = stack_Data.dropna()
+		stack_Data.sort_values('logSM',inplace=True)
+		stack_Data['D'] =  stack_Data.rolling(6000).median()['logSM']
+		stack_Data['col'] =  stack_Data.rolling(6000).median()['logNSF_Metal']
+		stack_Data.plot(ax = ax,x='D',y='col',legend=False,linewidth=1.5,color=Colors[2],label='Field')
+
+		ax.set_xlabel(r'$\mathrm{log \ M_{*}\; (M_{\odot})}$',fontsize=16)
+		ax.set_ylabel(r'$\mathrm{log \ Z_{NSF}}$',fontsize=16)
+		ax.tick_params(axis='both', which='minor', length=3, width=2, labelsize=14)
+		ax.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
+
+
+		ax.legend(fontsize=14)
+		#ax.xaxis.set_minor_locator(plt.MultipleLocator(0.1))
+		fig.tight_layout()
+		fig.savefig('/home/ankit/Fortran_code/Figures/NSFMetallicity_vs_Mstar.png',dpi=600)
+		#plt.show()
+
+		fig,ax = plt.subplots(1,1,figsize=(6,6))
+		
+		Total_data = pd.read_csv('/home/ankit/Fortran_code/All_Data_Stacked.csv')
+
+		Total_data.sort_values('d_per',inplace=True)
+		Total_data = Total_data.reset_index(drop=True)
+		Total_data = Total_data[Total_data['NSF_Metal']!=0.0]
+		#Filament['logSM'] = np.log10(Filament['SM'])
+		Total_data['logNSF_Metal'] = np.log10(Total_data['NSF_Metal'])
+
+		feature=['d_per','logNSF_Metal']
+		stack_Data = Total_data[feature]
+		stack_Data = stack_Data.dropna()
+		stack_Data.sort_values('d_per',inplace=True)
+		stack_Data['D'] =  stack_Data.rolling(6000).median()['d_per']
+		stack_Data['col'] =  stack_Data.rolling(6000).median()['logNSF_Metal']
+		stack_Data.plot(ax = ax,x='D',y='col',legend=False,linewidth=1.5,color=Colors[1],label='Filament')
+
+
+		ax.set_xlabel(r'$\mathrm{d_{per}}$(Mpc)',fontsize=16)
+		ax.set_ylabel(r'$\mathrm{log \ Z_{NSF}}$',fontsize=16)
+		ax.tick_params(axis='both', which='minor', length=3, width=2, labelsize=14)
+		ax.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
+
+		fig.savefig('/home/ankit/Fortran_code/Figures/NSFMetallicity_vs_d_per.png',dpi=600)
+
+
+		fig,ax = plt.subplots(1,1,figsize=(6,6))
+
+		Total_data = pd.read_csv('/home/ankit/Fortran_code/All_Data_Stacked.csv')
+
+		Total_data.sort_values('d_per',inplace=True)
+		Total_data = Total_data.reset_index(drop=True)
+		Total_data = Total_data[Total_data['SF_Metal']!=0.0]
+		#Filament['logSM'] = np.log10(Filament['SM'])
+		Total_data['logSF_Metal'] = np.log10(Total_data['SF_Metal'])
+
+		feature=['d_per','logSF_Metal']
+		stack_Data = Total_data[feature]
+		stack_Data = stack_Data.dropna()
+		stack_Data.sort_values('d_per',inplace=True)
+		stack_Data['D'] =  stack_Data.rolling(6000).median()['d_per']
+		stack_Data['col'] =  stack_Data.rolling(6000).median()['logSF_Metal']
+		stack_Data.plot(ax = ax,x='D',y='col',legend=False,linewidth=1.5,color=Colors[1],label='Filament')
+
+
+		ax.set_xlabel(r'$\mathrm{d_{per}}$(Mpc)',fontsize=16)
+		ax.set_ylabel(r'$\mathrm{log \ Z_{SF}}$',fontsize=16)
+		ax.tick_params(axis='both', which='minor', length=3, width=2, labelsize=14)
+		ax.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
+
+		fig.savefig('/home/ankit/Fortran_code/Figures/SFMetallicity_vs_d_per.png',dpi=600)
+
 
 def main():
 
@@ -783,6 +1238,12 @@ def main():
 	print "\n 5. Colored_slice for one slice\n"
 	print "\n 6. d vs color plot\n"
 	print "\n 7. scatter plot \n"
+	print "\n 8. Contour plot \n"
+	print "\n 9. Mass distribution for binned d_per \n"
+	print "\n 10. M hist for d binned \n"
+	print "\n 11. Plots for Gas Mass \n"
+	print "\n 12. Plots for Metallicity \n"
+
 
 	opt=input('option?')
 
@@ -791,9 +1252,9 @@ def main():
 	if opt==1:
 		Mvscol()
 	if opt==2:
-		prop = raw_input('what property?')
-		logit = raw_input('want to take log? yes or no? \t')
-		dens = raw_input('want the density? yes or no? \t')
+		prop = ConfigSectionMap("histogram")['prop']
+		logit = ConfigSectionMap("histogram")['log']
+		dens = ConfigSectionMap("histogram")['dens']
 		histogram(prop,logit,dens)
 
 	if opt==3:
@@ -821,7 +1282,11 @@ def main():
 	if opt==4:
 		Voilin_plot()
 	if opt==5:
-		Colored_slice()
+
+		sliceno=ConfigSectionMap("Colslice")['sliceno']
+
+		Colored_slice(sliceno)
+
 	if opt==6:
 		dvscol()
 
@@ -864,6 +1329,18 @@ def main():
 		logx=ConfigSectionMap("Binned")['logx']
 
 		Binned_dist(prop,xlabel,logx)
+
+	if opt==10:
+
+		Binned_Mass()
+	
+	if opt==11:
+
+		Gas_plots()
+
+	if opt==12:
+
+		Metallicity_plot()
 
 if __name__=='__main__':
 
