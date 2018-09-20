@@ -97,7 +97,7 @@ def Plot_this(DATA,Params,R):
 
 Available_data = ascii.read('DATA_FOR_ANALYSIS_WITHOUT_QUERRY.csv',names=['id','SM','VelDisp','SFR',\
 	'GM','Tot_Mass','SM_sh','Metal','SF_Metal','NSF_Metal',\
-	'SF_O','SF_H','x','y','z','SubGrpNum','Vel','Mass_sh','grpid','u','g','r','i','zmag','Y','J','H','K'])
+	'SF_O','SF_H','x','y','z','SubGrpNum','Vel','Mass_sh','grpid','u','g','r','i','zmag'])
 print Available_data.keys()
 
 for i in range(1,numslice+1):

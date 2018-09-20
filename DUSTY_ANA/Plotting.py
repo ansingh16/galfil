@@ -549,7 +549,7 @@ def All_data():
 
 		Di = ascii.read(direc+'/Final_data.csv',names=['id','SM','VelDisp','SFR','GM',\
 			'Tot_Mass','SM_sh','Metal','SF_Metal','NSF_Metal','SF_O','SF_H','x','y','z','SubGrpNum','Vel','Mass_sh','grpid','u','g','r','i',\
-			'zmag','Y','J','H','K','index','ENV','d_long','d_per','d_tot','xslice','yslice'])
+			'zmag','index','ENV','d_long','d_per','d_tot','xslice','yslice'])
 		
 		D_final = vstack([D_final, Di])
 
@@ -592,8 +592,8 @@ def dvscol():
 
 	#stack_Data.to_csv('Stacked_Data.csv',index=False)
 
-	stack_Data['D'] =  stack_Data.rolling(6000).median()['d_per']
-	stack_Data['col'] =  stack_Data.rolling(6000).median()['g_minus_r']
+	stack_Data['D'] =  stack_Data.rolling(600).median()['d_per']
+	stack_Data['col'] =  stack_Data.rolling(600).median()['g_minus_r']
 
 
 	stack_Data.plot(ax = ax,x='D',y='col',legend=False,linewidth=1.5,color='k')
@@ -605,7 +605,7 @@ def dvscol():
 
 	#ax.xaxis.set_minor_locator(plt.MultipleLocator(0.1))
 	fig.tight_layout()
-	fig.savefig(Path+'d_per_vs_gminusr.png',dpi=600)
+	#fig.savefig(Path+'d_per_vs_gminusr.png',dpi=600)
 	plt.show()
 
 def Scatter(props,colprop=None,xlabel=None,ylabel=None,logx=None,logy=None,logcol=None):
