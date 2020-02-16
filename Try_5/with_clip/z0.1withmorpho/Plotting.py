@@ -21,7 +21,7 @@ from scipy.stats import ttest_ind, ttest_ind_from_stats
 from scipy import stats
 #plt.style.use('dark_background')
 
-Path = 'Figures/newplots/'
+Path = 'Figures/2Mpc_plots/'
 
 Colors = ['#ED5752','#4D648D','#A1BE95']
 
@@ -83,7 +83,7 @@ def Separate_ENV():
 	print("Before=",Total_data[Total_data['ENV']=='filament'].shape)
 
 
-	Total_data.loc[Total_data.d_per >= 1.0, 'ENV'] = "field"
+	Total_data.loc[Total_data.d_per >= 2.0, 'ENV'] = "field"
 
 
 	print("After=",Total_data[Total_data['ENV']=='filament'].shape)
@@ -226,7 +226,7 @@ def Mvscol():
 			
 
 
-			fig.savefig(Path+'Stellar_mass_vs_uminusr.png',dpi=600,bbox_inches='tight')
+			fig.savefig(Path+'Stellar_mass_vs_uminusr.png',dpi=100,bbox_inches='tight')
 
 			plt.show()
 
@@ -352,7 +352,7 @@ def jointplot(props,xlabel=None,ylabel=None,remove0x=None,remove0y=None,logx=Non
 				lh._legmarker.set_markersize(5)
 
 
-			fig.savefig(Path+xprop+'vs'+yprop+'.png',dpi=600)
+			fig.savefig(Path+xprop+'vs'+yprop+'.png',dpi=100)
 			
 	
 			plt.show()
@@ -375,7 +375,7 @@ def Voilin_plot():
 			        data=Total_data, palette="muted", split=True)
 
 			ax.set(ylabel=r'$\mathrm{u - r}$',xlabel='Environment')
-			fig.savefig(Path+'violinplot.png',dpi=600)
+			fig.savefig(Path+'violinplot.png',dpi=100)
 			plt.show()
 
 
@@ -497,39 +497,15 @@ def Colored_slice(sliceno):
 			
 			
 
-			FIG1.legend(fontsize=14,markerscale=2)
+			AX1.legend(fontsize=14,markerscale=2)
 
 		
-			FIG1.savefig(Path+'/Color_without_filament.png',dpi=600)
-			FIG2.savefig(Path+'/No_color_with_filament.png',dpi=600)
-			FIG3.savefig(Path+'/No_color_without_filament.png',dpi=600)
+			FIG1.savefig(Path+'/Color_without_filament.png',dpi=100)
+			FIG2.savefig(Path+'/No_color_with_filament.png',dpi=100)
+			FIG3.savefig(Path+'/No_color_without_filament.png',dpi=100)
 
 			plt.show()
-			'''
-			onlyfiles = [f for f in listdir(direc)]
-				
-
-			filament_list = [f for f in onlyfiles if f.startswith('filament_')]
-
-			lengths = np.loadtxt(direc+'/Lengths.dat')
-			     
-			for q,f in enumerate(filament_list):
-					dat = np.loadtxt(direc+'/'+f)
-					if lengths[q]>1.0:
-						AX1.plot(dat[:,0],dat[:,1],color='red')
-						AX1.plot([],[])
-
-						
-
-
-
-			FIG1.legend(fontsize=13)
-
-			FIG1.tight_layout()
-
-			plt.show()
-		'''
-
+			
 
 def All_data():
 	D_final = Table()
@@ -600,11 +576,13 @@ def dvscol():
 	ax.set_ylabel(r'$g-r$',fontsize=16)
 	ax.tick_params(axis='both', which='minor', length=3, width=2, labelsize=14)
 	ax.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
-
+	ax.annotate('(a)',
+            xy=(0.90, 0.90), xycoords='axes fraction',fontsize=16)
+		
 	#ax.xaxis.set_minor_locator(plt.MultipleLocator(0.1))
 	fig.tight_layout()
 	#ax.set_xlim(0.0,5.0)
-	fig.savefig(Path+'d_per_vs_gminusr.png',dpi=600)
+	fig.savefig(Path+'d_per_vs_gminusr.png',dpi=100)
 	plt.show()
 
 def Scatter(props,colprop=None,xlabel=None,ylabel=None,logx=None,logy=None,logcol=None):
@@ -880,7 +858,7 @@ def Binned_dist(prop,xlabel,logx):
 
 		
 		plt.legend(title=r'$\mathrm{d_{per}}$')
-		fig.savefig(Path+'/Binned_dist_'+prop+'.png',dpi=600)
+		fig.savefig(Path+'/Binned_dist_'+prop+'.png',dpi=100)
 
 		plt.show()
 
@@ -952,7 +930,7 @@ def Binned_Mass():
 		
 		
 		plt.legend(title=r"$\mathrm{log \ M_{*}}$")
-		#fig.savefig(Path+'/Binned_dist_'+prop+'.png',dpi=600)
+		#fig.savefig(Path+'/Binned_dist_'+prop+'.png',dpi=100)
 
 		plt.show()
 
@@ -964,7 +942,7 @@ def Gas_plots():
 
 
 	Groups,Filament,Field = Separate_ENV()
-
+	print float(Filament[Filament['GM']==0.0].shape[0])/(Filament.shape[0])
 
 	Filament = Filament[Filament['GM']!=0.0]
 	Field = Field[Field['GM']!=0.0]
@@ -1016,7 +994,7 @@ def Gas_plots():
 
 	ax3[1].set_yticks([-1.1,-1.2,-1.3,-1.4])
 
-	fig3.savefig(Path+'/d_per_vs_mass_frac.png',dpi=600)
+	fig3.savefig(Path+'/d_per_vs_mass_frac.png',dpi=100)
 
 
 
@@ -1120,7 +1098,7 @@ def random_d_per():
 		#ax.xaxis.set_minor_locator(plt.MultipleLocator(0.1))
 
 		fig.tight_layout()
-		fig.savefig('/home/ankit/Fortran_code/Figures/Random_dper.png',dpi=600)
+		fig.savefig('/home/ankit/Fortran_code/Figures/Random_dper.png',dpi=100)
 		plt.show()
 
 
@@ -1244,6 +1222,15 @@ def Metallicity_plot():
 		ax2.set_ylabel(r'$log \ Z_{NSF}/Z_{\odot}$',fontsize=16)
 		ax2.tick_params(axis='both', which='minor', length=3, width=2, labelsize=14)
 		ax2.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
+		
+		# axt = ax2.twiny()
+		# #axt.set_xscale('log')#xaxis.tick_top()
+		# t = ax2.get_xticks()
+		# axt.set_xticks(t)#set_xticks(axarr[0,0].xaxis.get_majorticklocs()[1:])
+		# axt.xaxis.set_tick_params(which='both',direction='inout', length=7, width=2)
+		# axt.set_xticklabels([])
+		# #ax2.set_xlim(0.0,3.0)
+		# #axt.set_xlim(0.0,3.0)
 
 
 		#ax2.legend(fontsize=14)
@@ -1254,7 +1241,13 @@ def Metallicity_plot():
 		fig.tight_layout()
 		fig.subplots_adjust(wspace=0, hspace=0)
 
-		fig.savefig(Path+'/Z_plot1.png',dpi=600)
+		ax1.annotate('(a)',
+            xy=(0.90, 0.90), xycoords='axes fraction',fontsize=16)
+		ax2.annotate('(b)',
+            xy=(0.90, 0.90), xycoords='axes fraction',fontsize=16)
+
+
+		fig.savefig(Path+'/Z_plot1.png',dpi=100)
 		#plt.show()
 
 
@@ -1263,7 +1256,7 @@ def Metallicity_plot():
 		fig,(ax1,ax2) = plt.subplots(2,1,figsize=(6,6),sharex=True)
 
 		Total_data = pd.read_csv('All_Data_Stacked.csv')
-
+		Total_data = Total_data[Total_data['ENV']=='filament']
 		Total_data.sort_values('d_per',inplace=True)
 		Total_data = Total_data.reset_index(drop=True)
 		Total_data = Total_data[Total_data['GM']!=0.0]
@@ -1275,23 +1268,32 @@ def Metallicity_plot():
 		stack_Data = Total_data[feature]
 		stack_Data = stack_Data.dropna()
 		stack_Data.sort_values('d_per',inplace=True)
-		stack_Data['D'] =  stack_Data.rolling(10000).median()['d_per']
-		stack_Data['col'] =  stack_Data.rolling(10000).median()['logNSF_Metal']
+		stack_Data['D'] =  stack_Data.rolling(40000).median()['d_per']
+		stack_Data['col'] =  stack_Data.rolling(40000).median()['logNSF_Metal']
 		stack_Data.plot(ax = ax2,x='D',y='col',legend=False,linewidth=1.5,color='k',label='Filament')
 
 
-		ax2.set_xlabel(r'$d_{per}(Mpc)$',fontsize=16)
+		ax2.set_xlabel(r'$d_{per} \ (Mpc)$',fontsize=16)
 		ax2.set_ylabel(r'$log \ Z_{NSF}/Z_{\odot}$',fontsize=16)
 		ax2.tick_params(axis='both', which='minor', length=3, width=2, labelsize=14)
 		ax2.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
 
-		#fig.savefig('/home/ankit/Fortran_code/Figures/NSFMetallicity_vs_d_per.png',dpi=600)
+		#fig.savefig('/home/ankit/Fortran_code/Figures/NSFMetallicity_vs_d_per.png',dpi=100)
+		axt = ax2.twiny()
+		#axt.set_xscale('log')#xaxis.tick_top()
+		t = ax2.get_xticks()
+		axt.set_xticks(t)#set_xticks(axarr[0,0].xaxis.get_majorticklocs()[1:])
+		axt.xaxis.set_tick_params(which='both',direction='inout', length=7, width=2)
+		#ax2.set_xticklabels([])
+		axt.set_xticklabels([])
 
+		ax2.set_xlim(0.0,3.0)
+		axt.set_xlim(0.0,3.0)
 
 		#fig,ax = plt.subplots(1,1,figsize=(6,6))
 
 		Total_data = pd.read_csv('All_Data_Stacked.csv')
-
+		Total_data = Total_data[Total_data['ENV']=='filament']
 		Total_data.sort_values('d_per',inplace=True)
 		Total_data = Total_data.reset_index(drop=True)
 		Total_data = Total_data[Total_data['SF_Metal']!=0.0]
@@ -1302,21 +1304,32 @@ def Metallicity_plot():
 		stack_Data = Total_data[feature]
 		stack_Data = stack_Data.dropna()
 		stack_Data.sort_values('d_per',inplace=True)
-		stack_Data['D'] =  stack_Data.rolling(6000).median()['d_per']
-		stack_Data['col'] =  stack_Data.rolling(6000).median()['logSF_Metal']
+		stack_Data['D'] =  stack_Data.rolling(40000).median()['d_per']
+		stack_Data['col'] =  stack_Data.rolling(40000).median()['logSF_Metal']
 		stack_Data.plot(ax = ax1,x='D',y='col',legend=False,linewidth=1.5,color='k',label='Filament')
 
 
-		ax1.set_xlabel(r'$d_{per}(Mpc)$',fontsize=16)
+		ax1.set_xlabel(r'$d_{per} \ (Mpc)$',fontsize=16)
 		ax1.set_ylabel(r'$log \ Z_{SF}/Z_{\odot}$',fontsize=16)
 		ax1.tick_params(axis='both', which='minor', length=3, width=2, labelsize=14)
 		ax1.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
 		ax1.locator_params(axis='y', nbins=5)
 		
+		
+
+		ax1.annotate('(a)',
+            xy=(0.90, 0.90), xycoords='axes fraction',fontsize=16)
+		ax2.annotate('(b)',
+            xy=(0.90, 0.90), xycoords='axes fraction',fontsize=16)
+
+		ax1.set_xlim(0.0,3.0)
+		ax2.set_xlim(0.0,3.0)
+
+
 		fig.tight_layout()
 		fig.subplots_adjust(wspace=0, hspace=0)
 
-		fig.savefig(Path + '/Z_plot2.png',dpi=600)
+		fig.savefig(Path + '/Z_plot2.png',dpi=100)
 		plt.show()
 
 
@@ -1554,7 +1567,7 @@ def Passive_Active_Plot():
 		labels = g._legend_data.keys()
 		g.fig.legend(fontsize=14,labels=labels,title='State', loc='upper center',markerscale=4.)
 		
-		plt.savefig(Path+'/Passive_Active_Plot.png',dpi=600)
+		plt.savefig(Path+'/Passive_Active_Plot.png',dpi=100)
 		plt.show()
 
 
@@ -1758,13 +1771,13 @@ def Cummulative_plot(ax,D1,D2,massbin):
     props = dict(boxstyle='round', facecolor='white', alpha=0.5)
 
     # place a text box in upper left in axes coords
-    ax.text(0.05, 0.49, textstr1, transform=ax.transAxes, fontsize=14,
+    ax.text(0.05, 0.49, textstr1, transform=ax.transAxes, fontsize=16,
             verticalalignment='top', bbox=props,color='red')
     
-    ax.text(0.05, 0.36, textstr2, transform=ax.transAxes, fontsize=14,
+    ax.text(0.05, 0.36, textstr2, transform=ax.transAxes, fontsize=16,
             verticalalignment='top', bbox=props,color='blue')
 
-    ax.text(0.05, 0.65, massbin, transform=ax.transAxes, fontsize=14,
+    ax.text(0.05, 0.65, massbin, transform=ax.transAxes, fontsize=16,
             verticalalignment='top', bbox=props,color='black')
 
 
@@ -1777,7 +1790,7 @@ def Cummulative_plot(ax,D1,D2,massbin):
     #ax.set_xlabel(r'$d_{per}$(Mpc)',fontsize=14)
     
     #ax.set_title(massbin,fontsize=14)
-    ax.legend(loc=3,fontsize=14)
+    #ax.legend(loc=3,fontsize=14)
 
     #ax.set_xlim(0.001,)
 
@@ -2068,7 +2081,7 @@ def L_x_histogram():
 	#ax[0][0].hist(Low_Groups['logSFR'],bins='auto',density=True, color='peru', linewidth=2, label='Low',histtype='stepfilled')
 	
 
-	fig.savefig(Path+'/L_x_plot1.png',dpi=600)
+	fig.savefig(Path+'/L_x_plot1.png',dpi=100)
 
 	fig1,ax = plt.subplots(1,3,figsize=(12,6),sharey=True) 
 	
@@ -2097,7 +2110,7 @@ def L_x_histogram():
 	fig1.subplots_adjust(wspace=0.0, hspace=0.0)
 	fig1.tight_layout()
 	
-	fig1.savefig(Path+'/L_x_plot2.png',dpi=600)
+	fig1.savefig(Path+'/L_x_plot2.png',dpi=100)
 
 
 	fig2,ax = plt.subplots(1,3,figsize=(12,6),sharey=True) 
@@ -2130,7 +2143,7 @@ def L_x_histogram():
 	fig2.subplots_adjust(wspace=0.0, hspace=0.0)
 	fig2.tight_layout()
 	
-	fig2.savefig(Path+'/L_x_plot3.png',dpi=600)
+	fig2.savefig(Path+'/L_x_plot3.png',dpi=100)
 
 
 
@@ -2141,9 +2154,6 @@ def L_x_histogram():
 def Passive_fraction_vs_d():
 
 		Total_data = pd.read_csv('All_Data_Stacked.csv')
-
-		
-		#Filament = Total_data.loc[Total_data['ENV']=='filament']
 
 		Total_data['State'] = 'Active'
 
@@ -2192,9 +2202,12 @@ def Passive_fraction_vs_d():
 		ax.tick_params(axis='both', which='minor', length=3, width=2, labelsize=14)
 		ax.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
 		ax.set_xlim(0.0,2.5)
+		ax.annotate('(b)',
+            xy=(0.90, 0.90), xycoords='axes fraction',fontsize=16)
+	
 		fig.tight_layout()
 		#fig.savefig(Path+'/dvsPassive_fraction.pdf')
-		fig.savefig(Path+'/dvsPassive_fraction.png',dpi=600)
+		fig.savefig(Path+'/dvsPassive_fraction.png',dpi=100)
 
 
 		plt.show()
@@ -2253,7 +2266,7 @@ def dvsSFR():
 		plt.subplots_adjust(wspace=0, hspace=0)
 
 		#ax.set_xlim(0.0,5.0)
-		fig.savefig(Path+'d_vs_SFR.png',dpi=600)
+		fig.savefig(Path+'d_vs_SFR.png',dpi=100)
 		plt.show()
 
 
@@ -2264,6 +2277,7 @@ def shortest_distance(x1, y1, a, b, c):
     return d 
 
 
+        
 def RedBlueplot():
 		from scipy.optimize import curve_fit
 		import pandas as pd 
@@ -2275,7 +2289,8 @@ def RedBlueplot():
 		import scipy.stats as stats
 		from sklearn.linear_model import LinearRegression
 		import statistics as stat 
-		
+		from scipy.stats import ttest_ind, ttest_ind_from_stats
+
   
       
 
@@ -2289,7 +2304,7 @@ def RedBlueplot():
 
 		Total_data = pd.read_csv('/home/ankit/Fortran_code/Try_5/with_clip/z0.1/All_Data_Stacked.csv')
 
-		Total_data.loc[Total_data.d_per >= 1.0, 'ENV'] = "field"
+		Total_data.loc[Total_data.d_per >= 2.0, 'ENV'] = "field"
 		Total_data['State'] = 'Active'
 
 		Total_data.loc[Total_data['SFR']*1.0e9/Total_data['SM'] <= 0.01, 'State'] = 'Passive'
@@ -2297,7 +2312,7 @@ def RedBlueplot():
 		Total_data['g_minus_r'] = Total_data['g'] - Total_data['r']
 		Groups = Total_data.loc[Total_data['ENV']=='groups']
 
-		cut_red = 0.4
+		cut_red = 0.6
 
 		Red_galaxies = Groups.loc[Groups['g_minus_r']>cut_red]
 
@@ -2323,14 +2338,14 @@ def RedBlueplot():
 		y_red = Red_galaxies['g_minus_r']
 
 		D = shortest_distance(x_red,-y_red,or_fitted_model.parameters[0],1.0,-or_fitted_model.parameters[1])
-		print(D.min(),D.max(),1.0,-or_fitted_model.parameters[0],-or_fitted_model.parameters[1])
+		#print(D.min(),D.max(),1.0,-or_fitted_model.parameters[0],-or_fitted_model.parameters[1])
 
 
 
 		standard_deviation=stat.stdev(D)
-		print("standard_deviation is: ",standard_deviation)
+		#print("standard_deviation is: ",standard_deviation)
 		
-		parallel = standard_deviation*np.sqrt(1+or_fitted_model.parameters[0]**2)
+		parallel = 2*standard_deviation*np.sqrt(1+or_fitted_model.parameters[0]**2)
 
 
 		Fil = Total_data.loc[Total_data['ENV']=='filament']
@@ -2352,15 +2367,15 @@ def RedBlueplot():
 		Red_g = Groups.loc[Groups['sequence']=='red']
 		Blue_g = Groups.loc[Groups['sequence']=='blue']
 
-		print(Red_g.shape,Red_fil.shape)
+		#print(or_fitted_model.parameters[0],or_fitted_model.parameters[1])
 
 
 
 		ax2.scatter(Blue_fil['logSM'],Blue_fil['g_minus_r'],color='b',s=2)
 		ax2.scatter(Red_fil['logSM'],Red_fil['g_minus_r'],color='r',s=2)
-		ax2.plot(SM, or_fitted_model(SM), 'k-',
-		         label="model fitted w/ original data",linewidth=1.5)
-		ax1.plot(x,line_down,'k--',linewidth=1.5)
+		#ax2.plot(SM, or_fitted_model(SM), 'k-',linewidth=3.5)
+		ax2.plot(x,line_down,'k--',linewidth=3.5)
+		ax1.plot(x,line_down,'k--',linewidth=3.5)
 		ax1.scatter(Blue_g['logSM'],Blue_g['g_minus_r'],color='b',s=2)
 		ax1.scatter(Red_g['logSM'],Red_g['g_minus_r'],color='r',s=2)
 		ax1.plot(SM, or_fitted_model(SM), 'k-',
@@ -2373,12 +2388,16 @@ def RedBlueplot():
 		t, p = ttest_ind(Red_fil['logSM'], Blue_fil['logSM'], equal_var=False)
 		print("ttest_ind:            t = %g  p = %g" % (t, p))
 
+		bins = np.array([9.0,9.25,9.5,9.75,10.0,10.25,10.5,10.75,11.0])
+		ax3.hist(Blue_fil['logSM'],bins=bins,weights=np.ones_like(Blue_fil['logSM'])*100./len(Blue_fil['logSM']),histtype='step',linewidth=2.5,color='b',label='Blue')
+        
+		ax3.hist(Red_fil['logSM'],bins=bins,weights=np.ones_like(Red_fil['logSM'])*100./len(Red_fil['logSM']),histtype='step',linewidth=2.5,color='r',label='Red',linestyle='--')
+		#ax3.legend(fontsize=14)
+		print "filament Red", float(Red_fil.shape[0])/(Red_fil.shape[0]+Blue_fil.shape[0])
+		print "filament Blue",float(Blue_fil.shape[0])/(Red_fil.shape[0]+Blue_fil.shape[0])
 
-		sns.kdeplot(Red_fil['logSM'],shade=True,color='red',label='Red',ax=ax3)
-		sns.kdeplot(Blue_fil['logSM'],shade=True,color='blue',label='Blue',ax=ax3,linestyle='--')
-		
-		ax1.set_yticks([0.0,0.2,0.4,0.6,0.8,1.0])
-		ax2.set_yticks([0.0,0.2,0.4,0.6,0.8,1.0])
+		ax1.set_yticks([0.1,0.3,0.5,0.7,0.9])
+		ax2.set_yticks([0.1,0.3,0.5,0.7,0.9])
 		ax1.set_ylim(-0.05,1.0)
 		ax2.set_ylim(-0.05,1.0)
 		ax1.set_xlim(8.75,)
@@ -2394,28 +2413,58 @@ def RedBlueplot():
 		ax2.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
 		
 		ax3.set_xlabel(r'$log \ M_{*}(M_{\odot})$',fontsize=14)
-		ax3.set_ylabel(r'$\mathrm{Probability}$',fontsize=14)
+		ax3.set_ylabel(r'$\mathrm{Proportion \ (\%)}$',fontsize=14)
 
 		
 		#ax1.set_xlabel(r'$\mathrm{log_{10} \ M_{*} \ (M_{\odot})}$',fontsize=14)
-		ax1.set_ylabel(r'$g-r$',fontsize=14)
+		ax1.set_ylabel(r'$g-r \ (mag)}$',fontsize=14)
 		#ax2.set_xlabel(r'$\mathrm{log_{10} \ M_{*} \ (M_{\odot})}$',fontsize=14)
-		ax2.set_ylabel(r'$g-r$',fontsize=14)
+		ax2.set_ylabel(r'$g-r \ (mag)$',fontsize=14)
+
+		axt = ax3.twiny()
+		#axt.set_xscale('log')#xaxis.tick_top()
+		t = ax3.get_xticks()
+		axt.set_xticks(t)#set_xticks(axarr[0,0].xaxis.get_majorticklocs()[1:])
+		axt.xaxis.set_tick_params(which='both',direction='inout', length=7, width=2)
+		axt.set_xticklabels([])
+		ax3.set_xlim(9.0,11.0)
+		axt.set_xlim(9.0,11.0)
+
+		axt = ax2.twiny()
+		#axt.set_xscale('log')#xaxis.tick_top()
+		t = ax2.get_xticks()
+		axt.set_xticks(t)#set_xticks(axarr[0,0].xaxis.get_majorticklocs()[1:])
+		axt.xaxis.set_tick_params(which='both',direction='inout', length=7, width=2)
+		axt.set_xticklabels([])
+		ax2.set_xlim(9.0,11.0)
+		axt.set_xlim(9.0,11.0)
 
 
-
-		fig.subplots_adjust(wspace=0.0)
-		fig.tight_layout()
-		plt.legend(fontsize=14)
+		ax3.set_xticks(np.arange(9,11.5,0.5).tolist())
+		ax1.annotate('(a)',
+            xy=(0.02, 0.90), xycoords='axes fraction',fontsize=16)
+		ax2.annotate('(b)',
+            xy=(0.02, 0.90), xycoords='axes fraction',fontsize=16)
+		ax3.annotate('(c)',
+            xy=(0.02, 0.75), xycoords='axes fraction',fontsize=16)
+		print float(Red_fil[Red_fil['logSM']<=10.0].shape[0])/Red_fil.shape[0]
+		print float(Blue_fil[Blue_fil['logSM']<=10.0].shape[0])/Blue_fil.shape[0]
+		print float(Red_fil[Red_fil['logSM']<=9.5].shape[0])/Red_fil.shape[0]
+		print float(Blue_fil[Blue_fil['logSM']<=9.5].shape[0])/Blue_fil.shape[0]
 		
-		fig.savefig(Path+'/Red_Blue_thing.png',dpi=600)
+		ax3.legend(fontsize=14)
+		fig.tight_layout()
+		fig.subplots_adjust(wspace=0.0,hspace=0.0)
+
+		fig.savefig(Path+'/Red_Blue_thing.png',dpi=100)
 		plt.show()
+        
 
 def Passive_fraction_vs_MS():
 
 		Total_data = pd.read_csv('All_Data_Stacked.csv')
 
-		Total_data.loc[Total_data.d_per >= 1.0, 'ENV'] = "field"
+		Total_data.loc[Total_data.d_per >= 2.0, 'ENV'] = "field"
 		Total_data['State'] = 'Active'
 
 		Total_data.loc[Total_data['SFR']*1.0e9/Total_data['SM'] <= 0.01, 'State'] = 'Passive'
@@ -2475,10 +2524,12 @@ def Passive_fraction_vs_MS():
 
 		ax.tick_params(axis='both', which='minor', length=3, width=2, labelsize=14)
 		ax.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
-
+		ax.annotate('(c)',
+            xy=(0.55, 0.85), xycoords='axes fraction',fontsize=16)
+		
 		fig.tight_layout()
 		ax.legend(fontsize=14)
-		fig.savefig(Path+'/Mvs_Passive_fraction.png',dpi=600)
+		fig.savefig(Path+'/Mvs_Passive_fraction.png',dpi=100)
 
 		plt.show()
 
@@ -2509,7 +2560,7 @@ def Ellipticity():
 
 	Total_data = pd.read_csv('All_Data_Stacked.csv')
 
-	Total_data.loc[Total_data.d_per >= 1.0, 'ENV'] = "field"
+	Total_data.loc[Total_data.d_per >= 2.0, 'ENV'] = "field"
 	Total_data['State'] = 'Active'
 
 	Total_data.loc[Total_data['SFR']*1.0e9/Total_data['SM'] <= 0.01, 'State'] = 'Passive'
@@ -2598,8 +2649,616 @@ def Ellipticity():
 	ax.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
 
 	ax.legend(fontsize=14)
-	fig.savefig(Path+'/Ellipticity_plot_all.png',dpi=600)
+	fig.savefig(Path+'/Ellipticity_plot_all.png',dpi=100)
 	plt.show()
+
+def Revised_fig():
+
+
+
+	fig,ax = plt.subplots(3,1,figsize=(6,9),sharex=True)
+	Total_data = pd.read_csv('/home/ankit/Fortran_code/Try_5/with_clip/z0.1withmorpho/All_Data_Stacked.csv')
+
+	Filament = Total_data[Total_data['ENV']=='filament']
+
+	Filament.sort_values('d_per',inplace=True)
+
+	Filament['g_minus_r'] = Filament['g'] - Filament['r']
+
+	Filament['sSFR'] = np.log10(Filament['SFR']/Filament['SM'])
+
+	feature=['d_per','sSFR']
+	stack_Data = Filament[feature]
+	stack_Data = stack_Data.dropna()
+	stack_Data = stack_Data.loc[stack_Data['d_per']<=5.0]
+	stack_Data['D'] =  stack_Data.rolling(23000,min_periods=1).median()['d_per']
+	stack_Data['col'] =  stack_Data.rolling(23000,min_periods=1).median()['sSFR']
+	stack_Data.plot(ax = ax[0],x='D',y='col',legend=False,color='k')
+	ax[0].set_xlabel(r'$\mathrm{d_{per}}$(Mpc)',fontsize=16)
+	ax[0].set_ylabel(r'$log \ sSFR \ (yr^{-1})$',fontsize=16)
+	ax[0].tick_params(axis='both', which='minor', length=3, width=2, labelsize=14)
+	ax[0].tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
+
+	Filament = Filament[Filament['GM']!=0.0]
+
+	Filament['GMF'] = np.log10(Filament['GM']/Filament['Tot_Mass'])
+	Filament['SMF'] = np.log10(Filament['SM']/Filament['Tot_Mass'])
+	feature=['d_per','GMF','SMF']
+
+	stack_Data1 = Filament[feature]
+	stack_Data1 = stack_Data1.dropna()
+	stack_Data1.sort_values('d_per',inplace=True)
+	stack_Data1['D'] =  stack_Data1.rolling(23000).median()['d_per']
+	stack_Data1['col'] =  stack_Data1.rolling(23000).median()['GMF']
+	stack_Data1.plot(ax = ax[1],x='D',y='col',legend=False,linestyle='-',linewidth=1.5,color='k')
+
+
+	stack_Data1['D'] =  stack_Data1.rolling(23000).median()['d_per']
+	stack_Data1['col2'] =  stack_Data1.rolling(23000).median()['SMF']
+	stack_Data1.plot(ax = ax[2],x='D',y='col2',legend=False,linestyle='-',linewidth=1.5,color='k')
+
+	ax[1].set_ylabel(r'$log \ M_{\rm gas}/M_{tot}$',fontsize=14)
+	ax[1].set_xlabel(r'$\mathrm{d_{per} \ (Mpc)}$',fontsize=14)
+	ax[1].tick_params(axis='both', which='minor', length=3, width=2, labelsize=16)
+	ax[1].tick_params(axis='both', which='major', length=5, width=2, labelsize=16)
+
+	ax[2].set_ylabel(r'$log \ M_{*}/M_{tot}$',fontsize=14)
+	ax[2].set_xlabel(r'$d_{per} \ (Mpc)$',fontsize=14)
+	ax[2].tick_params(axis='both', which='minor', length=3, width=2, labelsize=16)
+	ax[2].tick_params(axis='both', which='major', length=5, width=2, labelsize=16)
+
+	#ax[1].get_legend().remove()
+
+	#ax[2].get_legend().remove()
+
+
+
+	ax[1].set_xlim(0.0,3.0)
+	ax[2].set_xlim(0.0,3.0)
+	ax[0].set_xlim(0.0,3.0)
+
+	ax[0].set_ylim(-10.140,-10.100)
+	ax[2].set_ylim(-1.4,-1.1)
+
+	ax[2].set_yticks([-1.15,-1.25,-1.35,-1.45])
+	ax[0].set_yticks([-10.135,-10.125,-10.115,-10.105,-10.105])
+
+
+
+
+	#ax.xaxis.set_minor_locator(plt.MultipleLocator(0.1))
+	#plt.subplots_adjust(wspace=0, hspace=0)
+	ax[0].annotate('(a)',
+            xy=(0.025, 0.85), xycoords='axes fraction',fontsize=16)
+	ax[1].annotate('(b)',
+            xy=(0.025, 0.85), xycoords='axes fraction',fontsize=16)
+	ax[2].annotate('(c)',
+            xy=(0.025, 0.85), xycoords='axes fraction',fontsize=16)
+	#ax.set_xlim(0.0,5.0)
+	# for ax1 in ax:
+
+	# 	for tk in ax1.get_xticklabels():
+	# 		tk.set_visible(True)
+
+	axt = ax[1].twiny()
+	#axt.set_xscale('log')#xaxis.tick_top()
+	t = ax[1].get_xticks()
+	axt.set_xticks(t)#set_xticks(axarr[0,0].xaxis.get_majorticklocs()[1:])
+	axt.xaxis.set_tick_params(which='both',direction='inout', length=7, width=2)
+	axt.set_xticklabels([])
+	ax[1].set_xlim(0.0,3.0)
+	axt.set_xlim(0.0,3.0)
+
+
+
+	axt = ax[2].twiny()
+	#axt.set_xscale('log')#xaxis.tick_top()
+	t = ax[2].get_xticks()
+	axt.set_xticks(t)#set_xticks(axarr[0,0].xaxis.get_majorticklocs()[1:])
+	axt.xaxis.set_tick_params(which='both',direction='inout', length=7, width=2)
+	axt.set_xticklabels([])
+	ax[2].set_xlim(0.0,3.0)
+	axt.set_xlim(0.0,3.0)
+
+	fig.tight_layout()
+
+	fig.subplots_adjust(wspace=0.0, hspace=0.0)
+
+
+	fig.savefig(Path+'d_vs_SFR_gas_frac.png',dpi=100)
+	plt.show()
+
+
+
+def Revised_fig2():
+
+		Total_data = pd.read_csv('All_Data_Stacked.csv')
+
+
+		Colors = ['red','blue','green']
+
+		Groups,Filament,Field = Separate_ENV()
+
+
+		fig,(ax1,ax2,ax3) = plt.subplots(3,1,figsize=(6,9),sharex=True)
+
+
+		Filament.sort_values('SM',inplace=True)
+		Filament = Filament.reset_index(drop=True)
+		Filament = Filament[Filament['SF_Metal']!=0.0]
+		Filament['logSM'] = np.log10(Filament['SM'])
+		Filament['logSF_Metal'] = np.log10(Filament['SF_Metal']/0.012)
+
+		feature=['logSM','logSF_Metal']
+		stack_Data = Filament[feature]
+		stack_Data = stack_Data.dropna()
+		stack_Data.sort_values('logSM',inplace=True)
+		stack_Data['D'] =  stack_Data.rolling(6000).median()['logSM']
+		stack_Data['col'] =  stack_Data.rolling(6000).median()['logSF_Metal']
+		stack_Data.plot(ax = ax1,x='D',y='col',legend=False,linewidth=1.5,color=Colors[1],label='Filament')
+
+		
+
+		Groups.sort_values('SM',inplace=True)
+		Groups = Groups.reset_index(drop=True)
+		Groups = Groups[Groups['SF_Metal']!=0.0]
+		Groups['logSM'] = np.log10(Groups['SM'])
+		Groups['logSF_Metal'] = np.log10(Groups['SF_Metal']/0.012)
+
+		feature=['logSM','logSF_Metal']
+		stack_Data = Groups[feature]
+		stack_Data = stack_Data.dropna()
+		stack_Data.sort_values('logSM',inplace=True)
+		stack_Data['D'] =  stack_Data.rolling(6000).median()['logSM']
+		stack_Data['col'] =  stack_Data.rolling(6000).median()['logSF_Metal']
+		stack_Data.plot(ax = ax1,x='D',y='col',legend=False,linewidth=1.5,color=Colors[0],label='Group')
+
+		
+
+		Field.sort_values('SM',inplace=True)
+		Field = Field.reset_index(drop=True)
+		Field = Field[Field['SF_Metal']!=0.0]
+		Field['logSM'] = np.log10(Field['SM'])
+		Field['logSF_Metal'] = np.log10(Field['SF_Metal']/0.012)
+
+		feature=['logSM','logSF_Metal']
+		stack_Data = Field[feature]
+		stack_Data = stack_Data.dropna()
+		stack_Data.sort_values('logSM',inplace=True)
+		stack_Data['D'] =  stack_Data.rolling(6000).median()['logSM']
+		stack_Data['col'] =  stack_Data.rolling(6000).median()['logSF_Metal']
+		stack_Data.plot(ax = ax1,x='D',y='col',legend=False,linewidth=1.5,color=Colors[2],label='Void')
+
+		ax1.set_xlabel(r'$log \ M_{*}\; (M_{\odot})$',fontsize=16)
+		ax1.set_ylabel(r'$log \ Z_{SF}/Z_{\odot}$',fontsize=16)
+		ax1.tick_params(axis='both', which='minor', length=3, width=2, labelsize=14)
+		ax1.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
+		ax1.set_ylim(0.1,0.9)
+		ax1.locator_params(axis='y', nbins=5)
+
+
+		ax1.legend(fontsize=14,loc=2)
+		
+		
+
+
+		Groups,Filament,Field = Separate_ENV()
+
+		Filament.sort_values('SM',inplace=True)
+		Filament = Filament.reset_index(drop=True)
+		Filament = Filament[Filament['NSF_Metal']!=0.0]
+		Filament['logSM'] = np.log10(Filament['SM'])
+		Filament['logNSF_Metal'] = np.log10(Filament['NSF_Metal']/0.012)
+
+		feature=['logSM','logNSF_Metal']
+		stack_Data = Filament[feature]
+		stack_Data = stack_Data.dropna()
+		stack_Data.sort_values('logSM',inplace=True)
+		stack_Data['D'] =  stack_Data.rolling(6000).median()['logSM']
+		stack_Data['col'] =  stack_Data.rolling(6000).median()['logNSF_Metal']
+		stack_Data.plot(ax = ax2,x='D',y='col',legend=False,linewidth=1.5,color=Colors[1],label='Filament')
+
+		Groups.sort_values('SM',inplace=True)
+		Groups = Groups.reset_index(drop=True)
+		Groups = Groups[Groups['NSF_Metal']!=0.0]
+		Groups['logSM'] = np.log10(Groups['SM'])
+		Groups['logNSF_Metal'] = np.log10(Groups['NSF_Metal']/0.012)
+
+		feature=['logSM','logNSF_Metal']
+		stack_Data = Groups[feature]
+		stack_Data = stack_Data.dropna()
+		stack_Data.sort_values('logSM',inplace=True)
+		stack_Data['D'] =  stack_Data.rolling(6000).median()['logSM']
+		stack_Data['col'] =  stack_Data.rolling(6000).median()['logNSF_Metal']
+		stack_Data.plot(ax = ax2,x='D',y='col',legend=False,linewidth=1.5,color=Colors[0],label='Group')
+
+		Field.sort_values('SM',inplace=True)
+		Field = Field.reset_index(drop=True)
+		Field = Field[Field['NSF_Metal']!=0.0]
+		Field['logSM'] = np.log10(Field['SM'])
+		Field['logNSF_Metal'] = np.log10(Field['NSF_Metal']/0.012)
+
+		feature=['logSM','logNSF_Metal']
+		stack_Data = Field[feature]
+		stack_Data = stack_Data.dropna()
+		stack_Data.sort_values('logSM',inplace=True)
+		stack_Data['D'] =  stack_Data.rolling(6000).median()['logSM']
+		stack_Data['col'] =  stack_Data.rolling(6000).median()['logNSF_Metal']
+		stack_Data.plot(ax = ax2,x='D',y='col',legend=False,linewidth=1.5,color=Colors[2],label='Field')
+
+		ax2.set_xlabel(r'$log \ M_{*}\; (M_{\odot})$',fontsize=16)
+		ax2.set_ylabel(r'$log \ Z_{NSF}/Z_{\odot}$',fontsize=16)
+		ax2.tick_params(axis='both', which='minor', length=3, width=2, labelsize=14)
+		ax2.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
+		ax1.xaxis.set_tick_params(which='both', direction='inout', length=8, width=2,)
+		ax2.xaxis.set_tick_params(which='both', direction='inout', length=8, width=2,)
+
+
+		#ax2.legend(fontsize=14)
+		ax2.locator_params(axis='y', nbins=5)
+		ax2.set_ylim(-1.0,0.7)
+		ax2.set_yticks([-0.75,-0.25,0.25])
+		#ax.xaxis.set_minor_locator(plt.MultipleLocator(0.1))
+		
+
+		Total_data = pd.read_csv('All_Data_Stacked.csv')
+
+		Total_data.loc[Total_data.d_per >= 2.0, 'ENV'] = "field"
+		Total_data['State'] = 'Active'
+
+		Total_data.loc[Total_data['SFR']*1.0e9/Total_data['SM'] <= 0.01, 'State'] = 'Passive'
+		Total_data['logSM'] = np.log10(Total_data['SM'])
+		Total_data['u_minus_r'] = Total_data['u'] - Total_data['r']
+		#Total_data['logSFR'] = np.log10(Total_data['SFR'])
+		Total_data['logTotM'] = np.log10(Total_data['Tot_Mass'])
+		Total_data['logsig'] = np.log10(Total_data['VelDisp'])
+		Filament = Total_data.loc[Total_data['ENV']=='filament']
+		Groups = Total_data.loc[Total_data['ENV']=='groups']
+		Field = Total_data.loc[Total_data['ENV']=='field']
+		
+		bins = np.array([9.0,9.15,9.30,9.45,9.6,9.75,9.90,10.05,10.2,10.35,10.50,\
+                         10.65,10.80,10.95,11.1])
+		center = (bins[:-1] + bins[1:]) / 2
+		#print len(bins)
+		labels = [int(i) for i in range(len(bins)-1)]
+		#print len(labels)
+		Filament['binned'] = pd.cut(Filament['logSM'], bins,labels=labels,duplicates='drop')
+		fraction=[]
+		frac_error = []
+		for lab in labels:
+		    tmp_passive = float(Filament.loc[(Filament['binned']==lab)&(Filament['State']=='Passive')].shape[0])
+		    tmp_active = float(Filament.loc[(Filament['binned']==lab)&(Filament['State']=='Active')].shape[0])
+		    fraction.append(tmp_passive/(tmp_active+tmp_passive))
+		    #frac_error.append(np.sqrt(tmp_passive))#/np.sqrt(tmp_active+tmp_passive))
+
+		ax3.plot(center,fraction,'b-',marker='o',linewidth=2.5,label='Filament')
+
+        
+        
+        
+		Groups['binned'] = pd.cut(Groups['logSM'], bins,labels=labels,duplicates='drop')
+		fraction=[]
+		for lab in labels:
+		    tmp_passive = float(Groups.loc[(Groups['binned']==lab)&(Groups['State']=='Passive')].shape[0])
+		    tmp_active = float(Groups.loc[(Groups['binned']==lab)&(Groups['State']=='Active')].shape[0])
+		    fraction.append(tmp_passive/(tmp_active+tmp_passive))
+		    #frac_error.append(np.sqrt(tmp_passive)/(np.sqrt(tmp_active)+np.sqrt(tmp_passive)))
+
+		ax3.plot(center,fraction,'r-',marker='o',linewidth=2.5,label='Group')
+
+        
+        
+		Field['binned'] = pd.cut(Field['logSM'], bins,labels=labels,duplicates='drop')
+		fraction=[]
+		for lab in labels:
+		    tmp_passive = float(Field.loc[(Field['binned']==lab)&(Field['State']=='Passive')].shape[0])
+		    tmp_active = float(Field.loc[(Field['binned']==lab)&(Field['State']=='Active')].shape[0])
+		    fraction.append(tmp_passive/(tmp_active+tmp_passive))
+
+		ax3.plot(center,fraction,'g-',marker='o',linewidth=2.5,label='Void')
+
+		ax3.set_xlabel(r'$log \ M_{*} \ (M_{\odot})$',fontsize=14)
+		ax3.set_ylabel('$\mathrm{Fraction \ of}$ \n $\mathrm{passive \ galaxies}$' ,fontsize=14)
+
+		ax3.tick_params(axis='both', which='minor', length=3, width=2, labelsize=14)
+		ax3.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
+		ax3.tick_params(axis='y', which='major')
+		ax1.tick_params(axis='y', which='major')
+
+		#ax1.xaxis.set_tick_params(which='both', direction='inout', length=8, width=2)
+	
+		#ax2.xaxis.set_tick_params(which='both', direction='inout', length=8, width=2)
+
+
+		axt = ax3.twiny()
+		#axt.set_xscale('log')#xaxis.tick_top()
+		t = ax3.get_xticks()
+		axt.set_xticks(t)#set_xticks(axarr[0,0].xaxis.get_majorticklocs()[1:])
+		axt.xaxis.set_tick_params(which='both',direction='inout', length=7, width=2)
+		axt.set_xticklabels([])
+		ax3.set_xlim(9.0,11.0)
+		axt.set_xlim(9.0,11.0)
+
+		axt = ax2.twiny()
+		#axt.set_xscale('log')#xaxis.tick_top()
+		t = ax2.get_xticks()
+		axt.set_xticks(t)#set_xticks(axarr[0,0].xaxis.get_majorticklocs()[1:])
+		axt.xaxis.set_tick_params(which='both',direction='inout', length=7, width=2)
+		axt.set_xticklabels([])
+		ax2.set_xlim(9.0,11.0)
+		axt.set_xlim(9.0,11.0)
+
+		#ax3.legend(fontsize=14)
+		fig.tight_layout()
+		fig.subplots_adjust(wspace=0, hspace=0)
+
+		ax1.annotate('(a)',
+            xy=(0.90, 0.90), xycoords='axes fraction',fontsize=16)
+		ax2.annotate('(b)',
+            xy=(0.90, 0.90), xycoords='axes fraction',fontsize=16)
+		ax3.annotate('(c)',
+            xy=(0.90, 0.90), xycoords='axes fraction',fontsize=16)
+
+
+		fig.savefig(Path+'/MvsZfrac.png',dpi=100)
+		plt.show()
+
+
+def Revised_fig3():
+
+	fig,(ax,ax2) = plt.subplots(2,1,figsize=(6,9))
+
+	Total_data = pd.read_csv('All_Data_Stacked.csv')
+	
+	Total_data = Total_data.loc[Total_data['ENV']=='filament']
+	
+	Total_data.sort_values('d_per',inplace=True)
+	
+	Total_data = Total_data.reset_index(drop=True)
+	
+	Total_data['g_minus_r'] = Total_data['g'] - Total_data['r']
+
+	#print Total_data['d_per'].max()
+
+
+	feature=['d_per','g_minus_r']
+
+	stack_Data = Total_data[feature]
+
+
+	stack_Data = stack_Data.dropna()
+	#stack_Data.sort_values('d_per',inplace=True)
+
+	#stack_Data.to_csv('Stacked_Data.csv',index=False)
+
+	stack_Data = stack_Data.loc[stack_Data['d_per']<=5.0]
+
+	stack_Data['D'] =  stack_Data.rolling(20000).median()['d_per']
+	stack_Data['col'] =  stack_Data.rolling(20000).median()['g_minus_r']
+
+
+	stack_Data.plot(ax = ax,x='D',y='col',legend=False,color='k')
+
+	ax.set_xlabel(r'$d_{per} \ (Mpc)$',fontsize=16)
+	ax.set_ylabel(r'$g-r \ (mag)$',fontsize=16)
+	ax.tick_params(axis='both', which='minor', length=3, width=2, labelsize=14)
+	ax.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
+	ax.annotate('(a)',
+            xy=(0.90, 0.90), xycoords='axes fraction',fontsize=16)
+
+
+
+
+	#ax.xaxis.set_minor_locator(plt.MultipleLocator(0.1))
+	Total_data = pd.read_csv('All_Data_Stacked.csv')
+
+	Total_data['State'] = 'Active'
+
+	Total_data.loc[Total_data['SFR']*1.0e9/Total_data['SM'] <= 0.01, 'State'] = 'Passive'
+
+
+
+	M_dot = Total_data['M_dot'].values
+
+	grouped = Total_data.groupby('ENV')
+
+	for key,data in grouped:
+		        #print key,data.shape
+		        if key=='filament':
+		            #data['ENV'][Total_data['d_per'] > 1.0] = 'field'
+		            Filament = data
+		        if key=='groups':
+		            Groups = data
+		        if key=='field':
+		            Field = data
+
+
+	
+	Filament = Filament.loc[Filament['d_per']<=5.0]
+	ser, bins = pd.qcut(Filament.d_per,10,retbins=True, labels=False)
+
+	#bins = np.array([0.0,0.2,0.4,0.6,0.8,1.0,1.2,1.4,1.6,1.8,2.0,2.2,2.4,2.6,2.8,3.0])
+
+
+
+	labels = [int(i) for i in range(len(bins)-1)]
+	Filament['binned'] = pd.cut(Filament['d_per'], bins,labels=labels,duplicates='drop')
+	fraction=[]
+	errors = []
+	dlab=[]
+	j=0
+	for lab in labels:
+		    tmp_passive = float(Filament.loc[(Filament['binned']==lab)&(Filament['State']=='Passive')].shape[0])
+		    tmp_active = float(Filament.loc[(Filament['binned']==lab)&(Filament['State']=='Active')].shape[0])
+		    if tmp_passive!=0.0:
+			    fraction.append(tmp_passive/(tmp_active+tmp_passive))
+			    errors.append(np.sqrt(tmp_passive/(tmp_active+tmp_passive)))
+			    dlab.append(bins[lab])
+			    j=j+1
+
+	
+
+	ax2.plot(dlab,fraction,color='k',marker='o',linewidth=2.5)
+	ax2.set_xlabel(r'$d_{per} \ (Mpc)}$',fontsize=14)
+	ax2.set_ylabel('$\mathrm{Fraction \ of}$ \n $\mathrm{passive \ galaxies}$',fontsize=14)
+
+	ax2.tick_params(axis='both', which='minor', length=3, width=2, labelsize=14, pad=10)
+	ax2.tick_params(axis='both', which='major', length=5, width=2, labelsize=14, pad=10)
+	ax2.annotate('(b)',
+            xy=(0.90, 0.90), xycoords='axes fraction',fontsize=16)
+		
+	
+	#ax.xaxis.set_tick_params(which='both', direction='inout', length=8, width=2,)
+	
+	axt = ax2.twiny()
+	#axt.xaxis.tick_top()
+	#axt.set_xticklabels([]) 
+
+	#axt.set_xticks([0.0,1.0,2.0,3.0,4.0,5.0])
+	axt.set_xticks([0.0,1.0,2.0,3.0,4.0])
+	axt.xaxis.set_tick_params(which='major',direction='inout', length=8, width=2)
+	axt.set_xticklabels([])
+	ax.set_xticklabels([])
+	ax2.set_xlim(0.0,4.0)
+	ax.set_xlim(0.0,4.0)
+
+	#ax3.legend(fontsize=14)
+	fig.tight_layout()
+	fig.subplots_adjust(wspace=0, hspace=0)
+	fig.savefig(Path+'/dvscolfrac.png',dpi=100)
+
+	plt.show()
+
+
+def Colored_slice_new(sliceno):
+
+			################################################################################################################
+
+
+
+			FIG1,AX1 = plt.subplots(1,1,figsize=(8,8))
+			FIG2,(AX3,AX2) = plt.subplots(2,1,figsize=(5,8),sharex=True)
+			#FIG3,AX3 = plt.subplots(1,1,figsize=(8,8))
+
+
+			direc = './SLICED_' + str(sliceno) 
+
+
+
+			Total_data = pd.read_csv(direc+'/Final_data.csv')
+			Total_data['ENV'][Total_data['d_per'] > 2.0] = 'field'
+
+
+
+			grouped = Total_data.groupby('ENV')
+
+			for key,data in grouped:
+				#print key,data.shape
+				if key=='filament':
+					#data['ENV'][Total_data['d_per'] > 1.0] = 'field'
+					Filament = data
+				if key=='groups':
+					Groups = data
+				if key=='field':
+					Field = data
+
+
+	
+
+			
+			AX1.scatter(Field['xslice'],Field['yslice'],s=4,color='k',label='field',alpha=0.3)
+			AX1.scatter(Filament['xslice'],Filament['yslice'],s=4,color='r',label='filament',alpha=1.0)
+			AX1.scatter(Groups['xslice'],Groups['yslice'],s=4,facecolor='black',edgecolor='k',label='group',alpha=1.0)
+
+			
+			dat = pd.read_csv(direc+'/All_env.csv')
+
+			
+			grouped = dat.groupby('ENV')
+
+			for key,data in grouped:
+				#print key,data.shape
+				
+				if key=='filament':
+					data['ENV'][data['d_per'] > 2.0] = 'field'
+					Filament = data
+				if key=='group':
+					Groups = data
+				if key=='field':
+					Field = data
+			
+			AX2.scatter(Field['xslice'],Field['yslice'],s=4,color='grey',label='field',alpha=1.0)
+			AX2.scatter(Filament['xslice'],Filament['yslice'],s=4,color='grey',label='filament',alpha=1.0)
+			AX2.scatter(Groups['xslice'],Groups['yslice'],s=4,color='grey',label='group',alpha=1.0)
+
+			AX3.scatter(Field['xslice'],Field['yslice'],s=4,color='k',label='field',alpha=1.0)
+			AX3.scatter(Filament['xslice'],Filament['yslice'],s=4,color='k',label='filament',alpha=1.0)
+			AX3.scatter(Groups['xslice'],Groups['yslice'],s=4,color='k',label='group',alpha=1.0)
+
+
+			'''
+			for ind,row in data.iterrows():
+
+				if(row['d_per']>1.0):
+					data.loc[ind, 'ENV'] = 'field' 
+			
+			
+			'''
+			
+			fil_to_plot  = np.genfromtxt(direc+'/fil_to_plot.txt',dtype='str')
+		
+
+			lengths = np.loadtxt(direc+'/Lengths.dat')
+			
+			for f in fil_to_plot:
+					dat = np.loadtxt(direc+'/'+f)
+					AX2.plot(dat[:,0],dat[:,1],color='red')
+					AX2.plot([],[])
+			
+
+			
+			AX1.tick_params(axis='both', which='minor', length=3, width=2, labelsize=18)
+			AX1.tick_params(axis='both', which='major', length=5, width=2, labelsize=18)
+			AX1.set_xlabel(r'$\mathrm{X^{\prime}}$',fontsize=18)
+			AX1.set_ylabel(r'$\mathrm{Y^{\prime}}$',fontsize=18)
+			
+
+			#AX2.tick_params(axis='both', which='minor', length=3, width=2, labelsize=14)
+			AX2.tick_params(axis='y', which='major', length=5, width=2, labelsize=12)
+			#AX2.set_xlabel(r'$\mathrm{X^{\prime}}$',fontsize=16)
+			AX2.set_ylabel(r'$\mathrm{Y^{\prime}}$',fontsize=12)
+
+			AX3.tick_params(axis='both', which='minor', length=3, width=2, labelsize=12)
+			AX3.tick_params(axis='both', which='major', length=5, width=2, labelsize=12)
+			AX3.set_xlabel(r'$\mathrm{X^{\prime}}$',fontsize=12)
+			AX3.set_ylabel(r'$\mathrm{Y^{\prime}}$',fontsize=12)
+			
+			axt = AX3.twiny()
+			#axt.set_xscale('log')#xaxis.tick_top()
+			t = AX3.get_xticks()
+			axt.set_xticks(t)#set_xticks(axarr[0,0].xaxis.get_majorticklocs()[1:])
+			axt.xaxis.set_tick_params(which='both',direction='inout', length=7, width=2)
+			#ax2.set_xticklabels([])
+			axt.set_xticklabels([])
+
+			AX3.set_xlim(-65.0,105)
+			axt.set_xlim(-65.0,105)
+
+			AX2.annotate('(b)',
+            xy=(0.90, 0.90), xycoords='axes fraction',fontsize=14)
+			AX3.annotate('(a)',
+            xy=(0.90, 0.90), xycoords='axes fraction',fontsize=14)
+	
+			AX1.legend(fontsize=18,markerscale=2)
+			FIG1.tight_layout()
+			FIG2.tight_layout()
+			FIG2.subplots_adjust(hspace=0.0,wspace=0.0)
+			
+			FIG1.savefig(Path+'/Color_without_filament.png',dpi=100)
+			FIG2.savefig(Path+'/No_color_with_filament_combined.png',dpi=100)
+			#FIG3.savefig(Path+'/No_color_without_filament.png',dpi=100)
+
+			plt.show()
 
 
 def main():
@@ -2631,6 +3290,12 @@ def main():
 	print("\n 23. Ellipticity plot\n")
 
 	opt=input('option?')
+	if opt==26:
+		Revised_fig3()
+	if opt==25:
+		Revised_fig2()
+	if opt==24:
+		Revised_fig()
 	if opt==23:
 		Ellipticity()
 
@@ -2651,8 +3316,7 @@ def main():
 		from scipy import stats
 
 		fig,axarr = plt.subplots(2,2,figsize=(10,10),sharey=True,sharex=True)
-
-
+		
 
 		Total_data = pd.read_csv('All_Data_Stacked.csv')
 		Total_data['State'] = 'Active'
@@ -2687,30 +3351,60 @@ def main():
 	
 				D2 = Passive['d_per']
 
-				t, p = ttest_ind(D1, D2, equal_var=False)
-				print(i,r,"ttest_ind:            t = %g  p = %g" % (t, p))
+				t, p = stats.kruskal(D1, D2)
+				print(i,r,"kruskal stat:            t = %g  p = %g" % (t, p))
 
 
 				Cummulative_plot(axarr[i-1,r-1],D1,D2,Title[k-1])
 				k=k+1
 		    
 
-		axarr[0,0].set_ylabel(r'$\mathrm{Cumulative \ fraction}$',fontsize=14)
-		axarr[1,0].set_ylabel(r'$\mathrm{Cumulative \ fraction}$',fontsize=14)
+		axarr[0,0].set_ylabel(r'$\mathrm{Cumulative \ fraction}$',fontsize=20)
+		axarr[1,0].set_ylabel(r'$\mathrm{Cumulative \ fraction}$',fontsize=20)
 
-		axarr[1,0].set_xlabel(r'$d_{per}(Mpc)$',fontsize=14)
-		axarr[1,1].set_xlabel(r'$d_{per}(Mpc)$',fontsize=14)
+		axarr[1,0].set_xlabel(r'$d_{per} \ (Mpc)$',fontsize=20)
+		axarr[1,1].set_xlabel(r'$d_{per} \ (Mpc)$',fontsize=20)
 		
-		axarr[0,0].tick_params(axis='y', which='minor', length=3, width=2, labelsize=14)
-		axarr[0,0].tick_params(axis='y', which='major', length=5, width=2, labelsize=14)
-		axarr[1,0].tick_params(axis='both', which='minor', length=3, width=2, labelsize=14)
-		axarr[1,0].tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
-		axarr[1,1].tick_params(axis='x', which='minor', length=3, width=2, labelsize=14)
-		axarr[1,1].tick_params(axis='x', which='major', length=5, width=2, labelsize=14)
-    	
-		fig.subplots_adjust(hspace=0.0,wspace=0.0)
+		axarr[0,0].tick_params(axis='both', which='minor', length=5, width=2, labelsize=20)
+		axarr[0,0].tick_params(axis='both', which='major', length=7, width=2, labelsize=20)
+		axarr[0,1].tick_params(axis='both', which='minor', length=5, width=2, labelsize=20)
+		axarr[0,1].tick_params(axis='both', which='major', length=7, width=2, labelsize=20)
+		
+		axarr[1,0].tick_params(axis='both', which='minor', length=5, width=2, labelsize=20)
+		axarr[1,0].tick_params(axis='both', which='major', length=7, width=2, labelsize=20)
+		axarr[1,1].tick_params(axis='both', which='minor', length=5, width=2, labelsize=20)
+		axarr[1,1].tick_params(axis='both', which='major', length=7, width=2, labelsize=20)
+		axarr[0,0].annotate('(a)',xy=(1.5, 0.95), xycoords='data',fontsize=20)
+		axarr[0,1].annotate('(b)',xy=(1.5, 0.95), xycoords='data',fontsize=20)
+		axarr[1,0].annotate('(c)',xy=(1.5, 0.95), xycoords='data',fontsize=20)
+		axarr[1,1].annotate('(d)',xy=(1.5, 0.95), xycoords='data',fontsize=20)
+		axarr[1,1].legend(loc=3,fontsize=18)
+
+		
+		
+		axt = axarr[1,0].twiny()
+		axt.set_xscale('log')#xaxis.tick_top()
+		t = axarr[1,0].get_xticks()
+		axt.set_xticks(t)#set_xticks(axarr[0,0].xaxis.get_majorticklocs()[1:])
+		axt.xaxis.set_tick_params(which='both',direction='inout', length=7, width=2)
+		axt.set_xticklabels([])
+		axarr[1,0].set_xlim(0.001,8.0)
+		axt.set_xlim(0.001,8.0)
+		
+		axt = axarr[1,1].twiny()
+		axt.set_xscale('log')#xaxis.tick_top()
+		t = axarr[1,1].get_xticks()
+		axt.set_xticks(t)#set_xticks(axarr[0,0].xaxis.get_majorticklocs()[1:])
+		axt.xaxis.set_tick_params(which='both',direction='inout', length=7, width=2)
+		axt.set_xticklabels([])
+		axarr[1,1].set_xlim(0.001,8.0)
+		axt.set_xlim(0.001,8.0)
+		
+		axarr[1,1].set_xlim(0.001,8.0)
+
 		fig.tight_layout()
-		fig.savefig(Path+'/Fraction_approach.png',dpi=600)
+		fig.subplots_adjust(hspace=0,wspace=0)
+		fig.savefig(Path+'/Fraction_approach.png',dpi=100)
 		plt.show()
 
 
@@ -2753,6 +3447,13 @@ def main():
 		sliceno=ConfigSectionMap("Colslice")['sliceno']
 
 		Colored_slice(sliceno)
+
+	if opt==27:
+		
+		sliceno=ConfigSectionMap("Colslice")['sliceno']
+
+		Colored_slice_new(sliceno)
+
 
 	if opt==6:
 		dvscol()
