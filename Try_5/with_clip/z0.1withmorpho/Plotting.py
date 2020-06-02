@@ -21,7 +21,7 @@ from scipy.stats import ttest_ind, ttest_ind_from_stats
 from scipy import stats
 #plt.style.use('dark_background')
 
-Path = 'Figures/2Mpc_plots/'
+Path = './Figures/2Mpc_plots/'
 
 Colors = ['#ED5752','#4D648D','#A1BE95']
 
@@ -428,9 +428,9 @@ def Colored_slice(sliceno):
 	
 
 			
-			AX1.scatter(Field['xslice'],Field['yslice'],s=4,color='k',label='field',alpha=0.3)
-			AX1.scatter(Filament['xslice'],Filament['yslice'],s=4,color='r',label='filament',alpha=1.0)
-			AX1.scatter(Groups['xslice'],Groups['yslice'],s=4,facecolor='black',edgecolor='k',label='group',alpha=1.0)
+			AX1.scatter(Field['xslice'],Field['yslice'],s=4,color='k',label='Field',alpha=0.3)
+			AX1.scatter(Filament['xslice'],Filament['yslice'],s=4,color='r',label='Filament',alpha=1.0)
+			AX1.scatter(Groups['xslice'],Groups['yslice'],s=4,facecolor='black',edgecolor='k',label='Group',alpha=1.0)
 
 			
 			dat = pd.read_csv(direc+'/All_env.csv')
@@ -453,9 +453,9 @@ def Colored_slice(sliceno):
 			AX2.scatter(Filament['xslice'],Filament['yslice'],s=4,color='grey',label='filament',alpha=1.0)
 			AX2.scatter(Groups['xslice'],Groups['yslice'],s=4,color='grey',label='group',alpha=1.0)
 
-			AX3.scatter(Field['xslice'],Field['yslice'],s=4,color='k',label='field',alpha=1.0)
-			AX3.scatter(Filament['xslice'],Filament['yslice'],s=4,color='k',label='filament',alpha=1.0)
-			AX3.scatter(Groups['xslice'],Groups['yslice'],s=4,color='k',label='group',alpha=1.0)
+			AX3.scatter(Field['xslice'],Field['yslice'],s=4,color='k',label='Voids',alpha=1.0)
+			AX3.scatter(Filament['xslice'],Filament['yslice'],s=4,color='k',label='Filaments',alpha=1.0)
+			AX3.scatter(Groups['xslice'],Groups['yslice'],s=4,color='k',label='Groups',alpha=1.0)
 
 
 			'''
@@ -500,7 +500,7 @@ def Colored_slice(sliceno):
 			AX1.legend(fontsize=14,markerscale=2)
 
 		
-			FIG1.savefig(Path+'/Color_without_filament.png',dpi=100)
+			FIG1.savefig(Path+'/Color_without_filament_thesis.png',dpi=100)
 			FIG2.savefig(Path+'/No_color_with_filament.png',dpi=100)
 			FIG3.savefig(Path+'/No_color_without_filament.png',dpi=100)
 
@@ -1772,10 +1772,10 @@ def Cummulative_plot(ax,D1,D2,massbin):
 
     # place a text box in upper left in axes coords
     ax.text(0.05, 0.49, textstr1, transform=ax.transAxes, fontsize=16,
-            verticalalignment='top', bbox=props,color='red')
+            verticalalignment='top', bbox=props,color='blue')
     
     ax.text(0.05, 0.36, textstr2, transform=ax.transAxes, fontsize=16,
-            verticalalignment='top', bbox=props,color='blue')
+            verticalalignment='top', bbox=props,color='red')
 
     ax.text(0.05, 0.65, massbin, transform=ax.transAxes, fontsize=16,
             verticalalignment='top', bbox=props,color='black')
@@ -2638,9 +2638,9 @@ def Ellipticity():
 
 
 
-	sns.kdeplot(Groups['ellip'],ax=ax,label='Groups',linewidth=2.5,color='red',linestyle='-')
+	sns.kdeplot(Groups['ellip'],ax=ax,label='Group',linewidth=2.5,color='red',linestyle='-')
 	sns.kdeplot(Fil['ellip'],ax=ax,label='Filament',linewidth=2.5,color='blue',linestyle='--')
-	sns.kdeplot(Field['ellip'],ax=ax,label='Void',linewidth=2.5,color='green',linestyle='-.')
+	sns.kdeplot(Field['ellip'],ax=ax,label='Field',linewidth=2.5,color='green',linestyle='-.')
 
 
 	ax.set_xlabel(r'$e$',fontsize=16)
@@ -2649,7 +2649,7 @@ def Ellipticity():
 	ax.tick_params(axis='both', which='major', length=5, width=2, labelsize=14)
 
 	ax.legend(fontsize=14)
-	fig.savefig(Path+'/Ellipticity_plot_all.png',dpi=100)
+	fig.savefig(Path+'/Ellipticity_plot_all_thesis.png',dpi=100)
 	plt.show()
 
 def Revised_fig():
