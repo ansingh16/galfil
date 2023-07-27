@@ -1,4 +1,9 @@
 *.csv
 *.png
 *.dat
+*.txt
+*.NDnet
+*.MSC
+*.vtp
+*.NDskl
 
